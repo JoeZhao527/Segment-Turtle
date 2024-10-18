@@ -18,13 +18,14 @@ Pillow==11.0.0
 psutil==6.0.0
 pycocotools==2.0.8
 Pygments==2.18.0
-PyYAML==5.1
+pytorch_lightning==2.4.0
+PyYAML==6.0.0
 recommonmark==0.7.1
 setuptools==75.1.0
 Shapely==2.0.6
 tabulate==0.9.0
 termcolor==2.5.0
 timm==1.0.11
-torch==2.1.0
-torchvision==0.16.0
+torch==2.0.0
+torchvision==0.15.0
 tqdm==4.66.5
