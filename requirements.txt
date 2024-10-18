@@ -18,7 +18,6 @@ Pillow==11.0.0
 psutil==6.0.0
 pycocotools==2.0.8
 Pygments==2.18.0
-pytorch_lightning==2.4.0
 PyYAML==5.1
 recommonmark==0.7.1
 setuptools==75.1.0
