@@ -30,3 +30,4 @@ torch==2.1.0
 torchvision==0.16.0
 tqdm==4.66.5
 pandas==2.2.3
+tensorboard==2.18.0
