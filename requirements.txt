@@ -21,7 +21,6 @@ pycocotools==2.0.8
 Pygments==2.18.0
 pytorch_lightning==2.4.0
 PyYAML==5.1
-PyYAML==6.0.2
 recommonmark==0.7.1
 scipy==1.14.1
 setuptools==75.1.0
