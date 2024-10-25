@@ -165,4 +165,5 @@ cython_debug/
 *.zip
 turtles-data/
 output/
+output_maskformer_pretrained
 *.ipynb
