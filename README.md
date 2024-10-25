@@ -23,6 +23,8 @@ Set up mask2former
 ./scripts/mask2former_setup.sh
 ```
 
+## Training
+
 Train detectron2
 ```
 python scripts/data_split.py
