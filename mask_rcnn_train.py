@@ -29,6 +29,12 @@ register_coco_instances("turtle_train", {}, os.path.join(base_dir, "annotations_
 register_coco_instances("turtle_val", {}, os.path.join(base_dir, "annotations_valid.json"), "./turtles-data/data")
 register_coco_instances("turtle_test", {}, os.path.join(base_dir, "annotations_test.json"), "./turtles-data/data")
 
+from detectron2.data import DatasetCatalog
+print(DatasetCatalog.list())
+print()
+print('sea_turtle_train' in DatasetCatalog.list())
+exit(0)
+
 from detectron2.engine import DefaultTrainer
 
 cfg = get_cfg()
@@ -38,13 +44,13 @@ cfg.DATASETS.VALID = ("turtle_val",)
 cfg.DATASETS.TEST = ("turtle_test",)
 cfg.DATALOADER.NUM_WORKERS = 2
 cfg.MODEL.WEIGHTS = model_zoo.get_checkpoint_url("COCO-InstanceSegmentation/mask_rcnn_R_50_FPN_3x.yaml")  # Let training initialize from model zoo
-cfg.SOLVER.IMS_PER_BATCH = 8  # This is the real "batch size" commonly known to deep learning people
+cfg.SOLVER.IMS_PER_BATCH = 2  # This is the real "batch size" commonly known to deep learning people
 cfg.SOLVER.BASE_LR = 0.00025  # pick a good LR
 cfg.SOLVER.MAX_ITER = 1000   # 300 iterations seems good enough for this toy dataset; you will need to train longer for a practical dataset
 cfg.SOLVER.STEPS = []        # do not decay learning rate
 cfg.MODEL.ROI_HEADS.BATCH_SIZE_PER_IMAGE = 128   # The "RoIHead batch size". 128 is faster, and good enough for this toy dataset (default: 512)
 cfg.MODEL.ROI_HEADS.NUM_CLASSES = 3  # only has one class (ballon). (see https://detectron2.readthedocs.io/tutorials/datasets.html#update-the-config-for-new-datasets)
-cfg.MODEL.DEVICE = 'cuda'
+cfg.MODEL.DEVICE = 'cuda' if torch.cuda.is_available() else 'cpu'
 # NOTE: this config means the number of classes, but a few popular unofficial tutorials incorrect uses num_classes+1 here.
 
 os.makedirs(cfg.OUTPUT_DIR, exist_ok=True)
