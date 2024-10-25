@@ -2,6 +2,8 @@
 import sys, os, distutils.core
 sys.path.insert(0, os.path.abspath('./detectron2'))
 
+import torch
+
 # Setup detectron2 logger
 import detectron2
 from detectron2.utils.logger import setup_logger
