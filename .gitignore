@@ -167,3 +167,4 @@ turtles-data/
 output/
 output_maskformer_pretrained
 *.ipynb
+nohup.out
