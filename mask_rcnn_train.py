@@ -29,12 +29,6 @@ register_coco_instances("turtle_train", {}, os.path.join(base_dir, "annotations_
 register_coco_instances("turtle_val", {}, os.path.join(base_dir, "annotations_valid.json"), "./turtles-data/data")
 register_coco_instances("turtle_test", {}, os.path.join(base_dir, "annotations_test.json"), "./turtles-data/data")
 
-from detectron2.data import DatasetCatalog
-print(DatasetCatalog.list())
-print()
-print('sea_turtle_train' in DatasetCatalog.list())
-exit(0)
-
 from detectron2.engine import DefaultTrainer
 
 cfg = get_cfg()
