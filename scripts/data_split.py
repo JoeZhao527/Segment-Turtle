@@ -19,9 +19,9 @@ split = pd.read_csv(split_path)
 coco = COCO(annotations_path)
 
 # Separate the COCO ids into train/valid/test based on the split DataFrame
-train_ids = split[split['split_closed'] == 'train']['id'].tolist()
-valid_ids = split[split['split_closed'] == 'valid']['id'].tolist()
-test_ids = split[split['split_closed'] == 'test']['id'].tolist()
+train_ids = split[split['split_open'] == 'train']['id'].tolist()
+valid_ids = split[split['split_open'] == 'valid']['id'].tolist()
+test_ids = split[split['split_open'] == 'test']['id'].tolist()
 
 def rle_to_polygon_annToMask(coco, ann):
     """
