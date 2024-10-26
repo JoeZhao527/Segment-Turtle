@@ -480,7 +480,7 @@ add_deeplab_config(cfg)
 add_maskformer2_config(cfg)
 
 # Ensure the config file path corresponds to your model's requirements
-cfg.merge_from_file("./Mask2Former/configs/coco/panoptic-segmentation/swin/maskformer2_swin_large_IN21k_384_bs16_100ep.yaml")
+cfg.merge_from_file("./Mask2Former/configs/coco/instance-segmentation/swin/maskformer2_swin_large_IN21k_384_bs16_100ep.yaml")
 # cfg.MODEL.WEIGHTS = 'https://dl.fbaipublicfiles.com/maskformer/mask2former/coco/panoptic/maskformer2_swin_large_IN21k_384_bs16_100ep/model_final_f07440.pkl'
 cfg.MODEL.WEIGHTS = 'https://dl.fbaipublicfiles.com/maskformer/mask2former/coco/panoptic/maskformer2_R50_bs16_50ep/model_final_94dc52.pkl'
 cfg.MODEL.MASK_FORMER.TEST.INSTANCE_ON = True
@@ -711,8 +711,8 @@ def setup_cfg():
     add_deeplab_config(cfg)      # Add ResNet/DeepLab configs
 
     # Load base Mask2Former configuration
-    cfg.merge_from_file("./Mask2Former/configs/coco/panoptic-segmentation/swin/maskformer2_swin_tiny_bs16_50ep.yaml")
-    cfg.MODEL.WEIGHTS = 'https://dl.fbaipublicfiles.com/maskformer/mask2former/coco/panoptic/maskformer2_swin_tiny_bs16_50ep/model_final_86143f.pkl'
+    cfg.merge_from_file("./Mask2Former/configs/coco/instance-segmentation/swin/maskformer2_swin_base_384_bs16_50ep.yaml")
+    cfg.MODEL.WEIGHTS = 'https://dl.fbaipublicfiles.com/maskformer/mask2former/coco/panoptic/maskformer2_swin_base_384_bs16_50ep/model_final_9d7f02.pkl'
     # Dataset settings
     cfg.DATASETS.TRAIN = ("sea_turtle_train",)
     cfg.DATASETS.TEST = ("sea_turtle_valid",)
