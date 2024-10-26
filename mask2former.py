@@ -654,46 +654,41 @@ def get_sea_turtle_dicts(dataset):
     wrapped_dataset = DatasetWrapper(dataset)
     
     for idx in range(len(wrapped_dataset)):
-        try:
-            # Get image and image_info from wrapped dataset
-            _, image_info = wrapped_dataset[idx]
-            instances = image_info['instances']
+        # Get image and image_info from wrapped dataset
+        _, image_info = wrapped_dataset[idx]
+        instances = image_info['instances']
+        
+        # Create record
+        record = {}
+        record["file_name"] = image_info["file_name"]
+        record["image_id"] = image_info["image_id"]
+        record["height"] = image_info["height"]
+        record["width"] = image_info["width"]
+        
+        # Convert annotations
+        objs = []
+        masks = instances.gt_masks.tensor
+        labels = instances.gt_classes
+        
+        for mask, label in zip(masks, labels):
+            # Convert mask to numpy
+            binary_mask = mask
             
-            # Create record
-            record = {}
-            record["file_name"] = image_info["file_name"]
-            record["image_id"] = image_info["image_id"]
-            record["height"] = image_info["height"]
-            record["width"] = image_info["width"]
+            # Get bounding box
+            bbox = mask_to_bbox(binary_mask)
             
-            # Convert annotations
-            objs = []
-            masks = instances.gt_masks.tensor
-            labels = instances.gt_classes
-            
-            for mask, label in zip(masks, labels):
-                # Convert mask to numpy
-                binary_mask = mask.numpy()
-                
-                # Get bounding box
-                bbox = mask_to_bbox(binary_mask)
-                
-                # Create annotation
-                obj = {
-                    "category_id": int(label.item()),
-                    "bbox": bbox,
-                    "bbox_mode": BoxMode.XYXY_ABS,
-                    "segmentation": binary_mask,
-                    "iscrowd": 0
-                }
-                objs.append(obj)
-            
-            record["annotations"] = objs
-            dataset_dicts.append(record)
-            
-        except Exception as e:
-            print(f"Error processing image {idx}: {str(e)}")
-            continue
+            # Create annotation
+            obj = {
+                "category_id": int(label.item()),
+                "bbox": bbox,
+                "bbox_mode": BoxMode.XYXY_ABS,
+                "segmentation": binary_mask,
+                "iscrowd": 0
+            }
+            objs.append(obj)
+        
+        record["annotations"] = objs
+        dataset_dicts.append(record)
     
     return dataset_dicts
 
