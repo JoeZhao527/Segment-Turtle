@@ -564,39 +564,119 @@ for name in MetadataCatalog:
 # %%
 ## Register New metadata
 from detectron2.data import DatasetCatalog, MetadataCatalog
-from detectron2.structures import BoxMode
+from detectron2.structures import BoxMode, BitMasks, Instances
 import numpy as np
+
+class DatasetWrapper:
+    def __init__(self, dataset):
+        self.dataset = dataset
+    
+    def __len__(self):
+        return len(self.dataset)
+    
+    def __getitem__(self, idx):
+        image, target = self.dataset[idx]
+        
+        # Create Instances object
+        instances = Instances(target['size'])
+        
+        # Convert masks to BitMasks
+        instances.gt_masks = BitMasks(target['masks'])
+        
+        # Convert labels to gt_classes
+        instances.gt_classes = target['labels']
+        
+        # Add image_id and other metadata
+        image_info = {
+            "image_id": target['image_id'].item(),
+            "file_name": os.path.join(self.dataset.image_dir, 
+                                    self.dataset.data.iloc[idx]['file_name']),
+            "height": target['size'][0].item(),
+            "width": target['size'][1].item(),
+            "instances": instances
+        }
+        
+        return image, image_info
+    
+# def get_sea_turtle_dicts(dataset):
+#     """Convert your dataset to detectron2 format"""
+#     dataset_dicts = []
+    
+#     for idx in range(len(dataset)):
+#         try:
+#             # Get image and target
+#             image, target = dataset[idx]
+            
+#             # Get image info
+#             height, width = target['size'].tolist()
+            
+#             # Get file path
+#             file_name = os.path.join(dataset.image_dir, dataset.data.iloc[idx]['file_name'])
+            
+#             # Create record
+#             record = {}
+#             record["file_name"] = file_name
+#             record["image_id"] = target['image_id'].item()
+#             record["height"] = height
+#             record["width"] = width
+            
+#             # Convert annotations
+#             objs = []
+#             for mask, label in zip(target['masks'], target['labels']):
+#                 # Convert mask to numpy
+#                 binary_mask = mask.numpy()
+                
+#                 # Get bounding box
+#                 bbox = mask_to_bbox(mask)
+                
+#                 # Create annotation
+#                 obj = {
+#                     "category_id": int(label.item()),
+#                     "bbox": bbox,
+#                     "bbox_mode": BoxMode.XYXY_ABS,
+#                     "segmentation": binary_mask,
+#                     "iscrowd": 0
+#                 }
+#                 objs.append(obj)
+            
+#             record["annotations"] = objs
+#             dataset_dicts.append(record)
+            
+#         except Exception as e:
+#             print(f"Error processing image {idx}: {str(e)}")
+#             continue
+    
+#     return dataset_dicts
 
 def get_sea_turtle_dicts(dataset):
     """Convert your dataset to detectron2 format"""
     dataset_dicts = []
+    wrapped_dataset = DatasetWrapper(dataset)
     
-    for idx in range(len(dataset)):
+    for idx in range(len(wrapped_dataset)):
         try:
-            # Get image and target
-            image, target = dataset[idx]
-            
-            # Get image info
-            height, width = target['size'].tolist()
-            
-            # Get file path
-            file_name = os.path.join(dataset.image_dir, dataset.data.iloc[idx]['file_name'])
+            # Get image and image_info from wrapped dataset
+            _, image_info = wrapped_dataset[idx]
+            instances = image_info['instances']
             
             # Create record
             record = {}
-            record["file_name"] = file_name
-            record["image_id"] = target['image_id'].item()
-            record["height"] = height
-            record["width"] = width
+            record["file_name"] = image_info["file_name"]
+            record["image_id"] = image_info["image_id"]
+            record["height"] = image_info["height"]
+            record["width"] = image_info["width"]
             
             # Convert annotations
             objs = []
-            for mask, label in zip(target['masks'], target['labels']):
+            masks = instances.gt_masks.tensor
+            labels = instances.gt_classes
+            
+            for mask, label in zip(masks, labels):
                 # Convert mask to numpy
                 binary_mask = mask.numpy()
                 
                 # Get bounding box
-                bbox = mask_to_bbox(mask)
+                bbox = mask_to_bbox(binary_mask)
                 
                 # Create annotation
                 obj = {
