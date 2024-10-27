@@ -29,6 +29,7 @@ class TurtleCOCOEvaluator(COCOEvaluator):
 
     def process(self, inputs, outputs):
         for input, output in zip(inputs, outputs):
+            print("output: ", output)
             prediction = {"image_id": input["image_id"]}
 
             if "proposals" in output:
