@@ -24,10 +24,13 @@ class TurtleCOCOEvaluator(COCOEvaluator):
     Only provide bbox evaluation and select best checkpoint based on that, since
     bbox proposal evaluation requires less evaluation time.
     """
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        
     def process(self, inputs, outputs):
         for input, output in zip(inputs, outputs):
             prediction = {"image_id": input["image_id"]}
-            
+
             if "proposals" in output:
                 prediction["proposals"] = output["proposals"].to(self._cpu_device)
             if len(prediction) > 1:

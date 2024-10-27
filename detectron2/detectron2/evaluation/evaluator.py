@@ -169,7 +169,9 @@ def inference_on_dataset(
             total_compute_time += time.perf_counter() - start_compute_time
 
             start_eval_time = time.perf_counter()
-            evaluator.process(inputs, outputs)
+            my_preds = evaluator.process(inputs, outputs)
+            print(my_preds)
+            exit(0)
             total_eval_time += time.perf_counter() - start_eval_time
 
             iters_after_start = idx + 1 - num_warmup * int(idx >= num_warmup)

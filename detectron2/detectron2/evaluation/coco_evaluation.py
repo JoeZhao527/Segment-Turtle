@@ -174,6 +174,8 @@ class COCOEvaluator(DatasetEvaluator):
             if len(prediction) > 1:
                 self._predictions.append(prediction)
 
+        return self._predictions
+    
     def evaluate(self, img_ids=None):
         """
         Args:
