@@ -26,7 +26,7 @@ class TurtleCOCOEvaluator(COCOEvaluator):
     """
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        
+
     def process(self, inputs, outputs):
         for input, output in zip(inputs, outputs):
             prediction = {"image_id": input["image_id"]}
@@ -36,3 +36,4 @@ class TurtleCOCOEvaluator(COCOEvaluator):
             if len(prediction) > 1:
                 self._predictions.append(prediction)
 
+        return self._predictions
