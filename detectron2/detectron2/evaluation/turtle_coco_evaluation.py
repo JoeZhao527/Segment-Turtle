@@ -30,7 +30,7 @@ class TurtleCOCOEvaluator(COCOEvaluator):
         super().__init__(*args, **kwargs)
 
         self.ground_truth_mask = init_ground_truth(self._coco_api)
-        self._predictions = {}
+        self.turle_mask_predictions = {}
 
     def process(self, inputs, outputs):
         for input, output in zip(inputs, outputs):
@@ -54,14 +54,14 @@ class TurtleCOCOEvaluator(COCOEvaluator):
                 ).detach().cpu().numpy()
 
             # Update the predictions dictionary with the computed masks for the current image
-            self._predictions = {**self._predictions, input["image_id"]: class_masks}
+            self.turle_mask_predictions = {**self.turle_mask_predictions, input["image_id"]: class_masks}
 
-        return self._predictions
+        return self.turle_mask_predictions
 
     def evaluate(self):
         eval_result = compute_iou(
             gt=self.ground_truth_mask,
-            pred=self._predictions
+            pred=self.turle_mask_predictions
         )
 
         turtle_miou = np.array(list(eval_result[1].values())).mean()
