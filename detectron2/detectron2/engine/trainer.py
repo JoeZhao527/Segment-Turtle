@@ -1,5 +1,6 @@
 from detectron2.engine import DefaultTrainer, hooks
 from detectron2.evaluation import COCOEvaluator, inference_on_dataset
+from detectron2.evaluation.turtle_coco_evaluation import TurtleCOCOEvaluator
 from detectron2.data import build_detection_test_loader
 import os
 
@@ -20,7 +21,7 @@ class CustomTrainer(DefaultTrainer):
     
     @classmethod
     def test(cls, cfg, model, evaluators=None):
-        return super().test(cfg, model, evaluators=COCOEvaluator(
+        return super().test(cfg, model, evaluators=TurtleCOCOEvaluator(
             cfg.DATASETS.TEST[0], output_dir=cfg.OUTPUT_DIR
         ))
     
