@@ -21,7 +21,7 @@ class CustomTrainer(DefaultTrainer):
     @classmethod
     def test(cls, cfg, model, evaluators=None):
         return super().test(cfg, model, evaluators=COCOEvaluator(
-            cfg.DATASETS.TEST, output_dir=cfg.OUTPUT_DIR
+            cfg.DATASETS.TEST[0], output_dir=cfg.OUTPUT_DIR
         ))
     
 
