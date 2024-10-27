@@ -27,7 +27,8 @@ class TurtleCOCOEvaluator(COCOEvaluator):
     def process(self, inputs, outputs):
         for input, output in zip(inputs, outputs):
             prediction = {"image_id": input["image_id"]}
-
+            print("???")
+            exit(0)
             if "proposals" in output:
                 prediction["proposals"] = output["proposals"].to(self._cpu_device)
             if len(prediction) > 1:
