@@ -27,14 +27,25 @@ class TurtleCOCOEvaluator(COCOEvaluator):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
+        print(self._coco_api)
+        exit(0)
     def process(self, inputs, outputs):
         for input, output in zip(inputs, outputs):
             print("output: ", output)
             prediction = {"image_id": input["image_id"]}
 
-            if "proposals" in output:
-                prediction["proposals"] = output["proposals"].to(self._cpu_device)
-            if len(prediction) > 1:
-                self._predictions.append(prediction)
+            # Get the unique classes present in pred_classes
+            unique_classes = torch.unique(outputs['pred_classes'])
+
+            # Create a dictionary to hold the masks for each unique class
+            class_masks = {}
+
+            # Perform logical OR for each class using tensor operations
+            for class_id in unique_classes:
+                class_masks[class_id.item()] = torch.any(outputs['pred_classes'][outputs['pred_classes'] == class_id], dim=0)
+
+            prediction['pred_masks'] = class_masks
+
+            self._predictions.append(prediction)
 
         return self._predictions
