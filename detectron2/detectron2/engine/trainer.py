@@ -14,7 +14,7 @@ class CustomTrainer(DefaultTrainer):
         hooks.insert(-1, BestCheckpointer(
             self.cfg.TEST.EVAL_PERIOD,
             self.checkpointer,
-            "bbox/AP50",
+            "average_miou",
             mode="max",
         ))
         return hooks
