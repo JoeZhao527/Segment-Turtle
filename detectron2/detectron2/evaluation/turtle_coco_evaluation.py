@@ -101,7 +101,7 @@ def compute_iou(gt, pred):
 
         for img_id, cats in tqdm(gt.items(), desc=f"Processing cat {cat_id}"):
             gt_mask = cats[cat_id]
-            pred_mask = get_mask(img_id, cat_id)
+            pred_mask = get_mask(pred, img_id, cat_id)
             
             if pred_mask is None:
                 pred_mask = np.zeros_like(gt_mask)
