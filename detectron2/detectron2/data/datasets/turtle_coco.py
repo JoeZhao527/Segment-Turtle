@@ -17,6 +17,8 @@ from detectron2.structures import Boxes, BoxMode, PolygonMasks, RotatedBoxes
 from detectron2.utils.file_io import PathManager
 from pycocotools.coco import COCO
 from tqdm import tqdm
+import copy
+from typing import List
 
 from .. import DatasetCatalog, MetadataCatalog
 
@@ -210,11 +212,11 @@ Category ids in annotations are not in [1, #categories]! We'll apply a mapping f
     return dataset_dicts
 
 
-def register_turtle_coco(data_dir: str, dev_mode: bool = False):
+def split_n_prepare_turtle_coco(data_dir: str, dev_mode: bool = False):
     """
-    Process and register the turtle dataset under data_dir.
+    Process and prepare the turtle dataset under data_dir.
 
-    It registers train, valid, and test sets for two settings:
+    It prepares train, valid, and test sets for two settings:
     1. the annotations for the whole turtle only
     2. the annotations for flippers, head, and carapace
 
@@ -223,9 +225,13 @@ def register_turtle_coco(data_dir: str, dev_mode: bool = False):
         dev_mode (bool): if true, only process a small portion of data for development
         
     Returns:
-        None.
+        Dict of dataset:
+        {
+            `dataset_name`: `dataset <List[dict]>`,
+            ...
+        }
 
-    Registered dataset names:
+    Avaliable dataset names:
         - Whole turtle:
             turtle_whole_train
             turtle_whole_valid
@@ -253,10 +259,11 @@ def register_turtle_coco(data_dir: str, dev_mode: bool = False):
 
     # Only process a small portion of data for development
     if dev_mode:
-        train_ids = train_ids[:100]
-        valid_ids = valid_ids[:100]
-        test_ids = test_ids[:100]
+        train_ids = train_ids[:80]
+        valid_ids = valid_ids[:40]
+        test_ids = test_ids[:20]
 
+    datasets = {}
     # Register each dataset split
     for split_name, img_ids in zip(
         ["train", "valid", "test"], [train_ids, valid_ids, test_ids]
@@ -266,24 +273,24 @@ def register_turtle_coco(data_dir: str, dev_mode: bool = False):
         # Process and register the whole turtle dataset
         _data_name = f"turtle_whole_{split_name}"
         split_coco_whole = create_split_coco(img_ids, coco, process_body_parts=False)
-        DatasetCatalog.register(
-            _data_name,
-            lambda: load_coco_api(split_coco_whole, data_dir, _data_name)
-        )
-        MetadataCatalog.get(_data_name).set(
-            evaluator_type="coco", image_root=data_dir
-        )
+        datasets[_data_name] = load_coco_api(split_coco_whole, data_dir, _data_name)
 
         # Process and register the turtle body parts dataset
         _data_name = f"turtle_parts_{split_name}"
         split_coco_parts = create_split_coco(img_ids, coco, process_body_parts=True)
-        DatasetCatalog.register(
-            _data_name,
-            lambda: load_coco_api(split_coco_parts, data_dir, _data_name)
-        )
-        MetadataCatalog.get(_data_name).set(
-            evaluator_type="coco", image_root=data_dir
-        )
+        datasets[_data_name] = load_coco_api(split_coco_parts, data_dir, _data_name)
+
+    return datasets
+
+
+def register_turtle_coco(dataset: List[dict], dataset_name: str, data_dir: str, meta: dict = {}):
+    DatasetCatalog.register(
+        dataset_name,
+        lambda: dataset
+    )
+    MetadataCatalog.get(dataset_name).set(
+        evaluator_type="coco", image_root=data_dir, **meta
+    )
 
 
 def create_split_coco(img_ids, coco, process_body_parts):
