@@ -264,22 +264,24 @@ def register_turtle_coco(data_dir: str, dev_mode: bool = False):
         logger.info(f"Preprocessing and registering for {split_name} data...")
 
         # Process and register the whole turtle dataset
+        _data_name = f"turtle_whole_{split_name}"
         split_coco_whole = create_split_coco(img_ids, coco, process_body_parts=False)
         DatasetCatalog.register(
-            f"turtle_whole_{split_name}",
-            lambda: load_coco_api(split_coco_whole, data_dir)
+            _data_name,
+            lambda: load_coco_api(split_coco_whole, data_dir, _data_name)
         )
-        MetadataCatalog.get(f"turtle_whole_{split_name}").set(
+        MetadataCatalog.get(_data_name).set(
             evaluator_type="coco", image_root=data_dir
         )
 
         # Process and register the turtle body parts dataset
+        _data_name = f"turtle_parts_{split_name}"
         split_coco_parts = create_split_coco(img_ids, coco, process_body_parts=True)
         DatasetCatalog.register(
-            f"turtle_parts_{split_name}",
-            lambda: load_coco_api(split_coco_parts, data_dir)
+            _data_name,
+            lambda: load_coco_api(split_coco_parts, data_dir, _data_name)
         )
-        MetadataCatalog.get(f"turtle_parts_{split_name}").set(
+        MetadataCatalog.get(_data_name).set(
             evaluator_type="coco", image_root=data_dir
         )
 
