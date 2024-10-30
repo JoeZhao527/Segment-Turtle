@@ -300,6 +300,10 @@ def create_split_coco(img_ids, coco, process_body_parts):
             # For the whole turtle dataset, keep only category 1 annotations
             processed_anns = [ann for ann in anns if ann["category_id"] == 1]
 
+        # Make detectron2 happy
+        for _ann in processed_anns:
+            _ann["iscrowd"] = 0
+
         # Add processed annotations to new split dict
         for ann in processed_anns:
             split_annotations[ann["id"]] = ann
