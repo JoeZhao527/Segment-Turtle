@@ -561,6 +561,8 @@ def build_detection_train_loader(
             ``total_batch_size / num_workers``, where ``mapped_element`` is produced
             by the ``mapper``.
     """
+    print(dataset[0])
+    exit(0)
     if isinstance(dataset, list):
         dataset = DatasetFromList(dataset, copy=False)
     if mapper is not None:
