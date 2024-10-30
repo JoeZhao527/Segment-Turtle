@@ -32,7 +32,7 @@ base_dir = "./turtles-data/data"
 # register_coco_instances("turtle_train", {}, os.path.join(base_dir, "annotations_train.json"), "./turtles-data/data")
 # register_coco_instances("turtle_val", {}, os.path.join(base_dir, "annotations_valid.json"), "./turtles-data/data")
 # register_coco_instances("turtle_test", {}, os.path.join(base_dir, "annotations_test.json"), "./turtles-data/data")
-register_turtle_coco(base_dir)
+register_turtle_coco(base_dir, dev_mode=True)
 
 from detectron2.engine import DefaultTrainer
 
@@ -61,6 +61,7 @@ cfg.MODEL.ROI_HEADS.BATCH_SIZE_PER_IMAGE = 32   # The "RoIHead batch size". 128 
 cfg.MODEL.ROI_HEADS.NUM_CLASSES = 3  # only has one class (ballon). (see https://detectron2.readthedocs.io/tutorials/datasets.html#update-the-config-for-new-datasets)
 cfg.MODEL.DEVICE = 'cuda' if torch.cuda.is_available() else 'cpu'
 cfg.TEST.EVAL_PERIOD = 1000
+cfg.INPUT.MASK_FORMAT = 'bitmask'
 # NOTE: this config means the number of classes, but a few popular unofficial tutorials incorrect uses num_classes+1 here.
 print(cfg)
 

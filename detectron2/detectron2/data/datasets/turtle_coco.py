@@ -210,7 +210,7 @@ Category ids in annotations are not in [1, #categories]! We'll apply a mapping f
     return dataset_dicts
 
 
-def register_turtle_coco(data_dir: str):
+def register_turtle_coco(data_dir: str, dev_mode: bool = False):
     """
     Process and register the turtle dataset under data_dir.
 
@@ -220,6 +220,7 @@ def register_turtle_coco(data_dir: str):
 
     Args:
         data_dir (str): the turtle data root dir
+        dev_mode (bool): if true, only process a small portion of data for development
         
     Returns:
         None.
@@ -249,6 +250,12 @@ def register_turtle_coco(data_dir: str):
     train_ids = split[split['split_open'] == 'train']['id'].tolist()
     valid_ids = split[split['split_open'] == 'valid']['id'].tolist()
     test_ids = split[split['split_open'] == 'test']['id'].tolist()
+
+    # Only process a small portion of data for development
+    if dev_mode:
+        train_ids = train_ids[:100]
+        valid_ids = valid_ids[:100]
+        test_ids = test_ids[:100]
 
     # Register each dataset split
     for split_name, img_ids in zip(
