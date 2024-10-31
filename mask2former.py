@@ -38,6 +38,17 @@ def register_dataset(cfg):
     cfg.DATASETS.TRAIN = ("turtle_parts_train",)
     cfg.DATASETS.TEST = ("turtle_parts_valid",)
 
+def prepare_model(cfg):
+    cfg.merge_from_file("./detectron2/configs/COCO-Mask2former/instance-segmentation/swin/maskformer2_swin_base_384_bs16_50ep.yaml")
+    cfg.MODEL.WEIGHTS = "https://dl.fbaipublicfiles.com/maskformer/mask2former/coco/instance/maskformer2_swin_base_384_bs16_50ep/model_final_f6e0f6.pkl"
+    cfg.DATALOADER.NUM_WORKERS = 0
+    cfg.SOLVER.IMS_PER_BATCH = 4
+    cfg.MODEL.ROI_HEADS.BATCH_SIZE_PER_IMAGE = 32
+    cfg.MODEL.ROI_HEADS.NUM_CLASSES = 3
+    cfg.MODEL.ROI_BOX_HEAD.FED_LOSS_NUM_CLASSES = 3
+    cfg.MODEL.SEM_SEG_HEAD.NUM_CLASSES = 3
+    cfg.MODEL.RETINANET.NUM_CLASSES = 3
+    
 def setup(args):
     """
     Create configs and perform basic setups.
@@ -46,9 +57,8 @@ def setup(args):
     # for poly lr schedule
     add_deeplab_config(cfg)
     add_maskformer2_config(cfg)
-    cfg.merge_from_file("./detectron2/configs/COCO-Mask2former/instance-segmentation/swin/maskformer2_swin_base_384_bs16_50ep.yaml")
-    cfg.MODEL.WEIGHTS = "https://dl.fbaipublicfiles.com/maskformer/mask2former/coco/instance/maskformer2_swin_base_384_bs16_50ep/model_final_f6e0f6.pkl"
-    cfg.DATALOADER.NUM_WORKERS = 0
+    
+    prepare_model(cfg)
     register_dataset(cfg)
     cfg.freeze()
     default_setup(cfg, args)
