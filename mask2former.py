@@ -39,8 +39,8 @@ def register_dataset(cfg):
     cfg.DATASETS.TEST = ("turtle_parts_valid",)
 
 def prepare_model(cfg):
-    cfg.merge_from_file("./detectron2/configs/COCO-Mask2former/instance-segmentation/swin/maskformer2_swin_base_384_bs16_50ep.yaml")
-    cfg.MODEL.WEIGHTS = "https://dl.fbaipublicfiles.com/maskformer/mask2former/coco/instance/maskformer2_swin_base_384_bs16_50ep/model_final_f6e0f6.pkl"
+    cfg.merge_from_file("./detectron2/configs/COCO-Mask2former/instance-segmentation/swin/maskformer2_swin_tiny_bs16_50ep.yaml")
+    cfg.MODEL.WEIGHTS = "https://dl.fbaipublicfiles.com/maskformer/mask2former/coco/instance/maskformer2_swin_tiny_bs16_50ep/model_final_86143f.pkl"
     cfg.DATALOADER.NUM_WORKERS = 0
     cfg.SOLVER.IMS_PER_BATCH = 1
     cfg.MODEL.ROI_HEADS.BATCH_SIZE_PER_IMAGE = 32
