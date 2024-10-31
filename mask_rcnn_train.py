@@ -33,7 +33,7 @@ base_dir = "./turtles-data/data"
 # register_coco_instances("turtle_val", {}, os.path.join(base_dir, "annotations_valid.json"), "./turtles-data/data")
 # register_coco_instances("turtle_test", {}, os.path.join(base_dir, "annotations_test.json"), "./turtles-data/data")
 
-datasets = split_n_prepare_turtle_coco(base_dir, dev_mode=True)
+datasets = split_n_prepare_turtle_coco(base_dir, dev_mode=False)
 
 for _name, _data in datasets.items():
     register_turtle_coco(_data, _name, base_dir)
