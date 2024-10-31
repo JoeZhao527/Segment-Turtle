@@ -35,7 +35,7 @@ from detectron2.data import build_detection_test_loader
 def register_dataset(cfg):
     base_dir = "./turtles-data/data"
 
-    datasets = split_n_prepare_turtle_coco(base_dir, dev_mode=True)
+    datasets = split_n_prepare_turtle_coco(base_dir, dev_mode=False)
 
     for _name, _data in datasets.items():
         register_turtle_coco(_data, _name, base_dir)
