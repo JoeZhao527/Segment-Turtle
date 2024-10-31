@@ -55,7 +55,7 @@ def prepare_model(cfg):
     cfg.MODEL.RETINANET.NUM_CLASSES = 3
     cfg.OUTPUT_DIR = "./output_mask2former"
     cfg.SOLVER.BASE_LR = 0.00025  # pick a good LR
-    cfg.SOLVER.MAX_ITER = 300
+    cfg.SOLVER.MAX_ITER = 10
     cfg.TEST.EVAL_PERIOD = 100
 
 def setup(args):
@@ -69,7 +69,6 @@ def setup(args):
     
     prepare_model(cfg)
     register_dataset(cfg)
-    cfg.freeze()
     default_setup(cfg, args)
     # Setup logger for "mask_former" module
     setup_logger(output=cfg.OUTPUT_DIR, distributed_rank=comm.get_rank(), name="mask2former")
