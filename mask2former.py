@@ -19,6 +19,7 @@ from detectron2.engine import (
     default_setup,
     default_argument_parser
 )
+from detectron2.engine import DefaultPredictor
 from detectron2.projects.deeplab import add_deeplab_config, build_lr_scheduler
 from detectron2.solver.build import maybe_add_gradient_clipping
 from detectron2.utils.logger import setup_logger
@@ -26,6 +27,10 @@ from mask2former.trainer import Trainer
 from mask2former import add_maskformer2_config
 
 from detectron2.data.datasets.turtle_coco import split_n_prepare_turtle_coco, register_turtle_coco
+
+from detectron2.evaluation import COCOEvaluator, inference_on_dataset
+from detectron2.evaluation.turtle_coco_evaluation import TurtleCOCOEvaluator
+from detectron2.data import build_detection_test_loader
 
 def register_dataset(cfg):
     base_dir = "./turtles-data/data"
@@ -42,12 +47,16 @@ def prepare_model(cfg):
     cfg.merge_from_file("./detectron2/configs/COCO-Mask2former/instance-segmentation/swin/maskformer2_swin_tiny_bs16_50ep.yaml")
     cfg.MODEL.WEIGHTS = "https://dl.fbaipublicfiles.com/maskformer/mask2former/coco/instance/maskformer2_swin_tiny_bs16_50ep/model_final_86143f.pkl"
     cfg.DATALOADER.NUM_WORKERS = 0
-    cfg.SOLVER.IMS_PER_BATCH = 1
+    cfg.SOLVER.IMS_PER_BATCH = 2
     cfg.MODEL.ROI_HEADS.BATCH_SIZE_PER_IMAGE = 32
     cfg.MODEL.ROI_HEADS.NUM_CLASSES = 3
     cfg.MODEL.ROI_BOX_HEAD.FED_LOSS_NUM_CLASSES = 3
     cfg.MODEL.SEM_SEG_HEAD.NUM_CLASSES = 3
     cfg.MODEL.RETINANET.NUM_CLASSES = 3
+    cfg.OUTPUT_DIR = "./output_mask2former"
+    cfg.SOLVER.BASE_LR = 0.00025  # pick a good LR
+    cfg.SOLVER.MAX_ITER = 300
+    cfg.TEST.EVAL_PERIOD = 100
 
 def setup(args):
     """
@@ -77,3 +86,11 @@ if __name__ == '__main__':
     trainer = Trainer(cfg)
     trainer.resume_or_load(resume=False)
     trainer.train()
+
+    cfg.MODEL.WEIGHTS = os.path.join(cfg.OUTPUT_DIR, "model_best.pth")  # path to the model we just trained
+    cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = 0.7   # set a custom testing threshold
+    predictor = DefaultPredictor(cfg)
+
+    evaluator = TurtleCOCOEvaluator("turtle_parts_test", output_dir=cfg.OUTPUT_DIR)
+    tst_loader = build_detection_test_loader(cfg, "turtle_parts_test")
+    print(inference_on_dataset(predictor.model, tst_loader, evaluator))
