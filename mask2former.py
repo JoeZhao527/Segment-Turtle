@@ -46,8 +46,8 @@ def setup(args):
     # for poly lr schedule
     add_deeplab_config(cfg)
     add_maskformer2_config(cfg)
-    cfg.merge_from_file(args.config_file)
-    cfg.merge_from_list(args.opts)
+    cfg.merge_from_file("./detectron2/configs/COCO-Mask2former/instance-segmentation/swin/maskformer2_swin_base_384_bs16_50ep.yaml")
+    cfg.MODEL.WEIGHTS = "https://dl.fbaipublicfiles.com/maskformer/mask2former/coco/instance/maskformer2_swin_base_384_bs16_50ep/model_final_f6e0f6.pkl"
     cfg.freeze()
     default_setup(cfg, args)
     # Setup logger for "mask_former" module
@@ -63,16 +63,5 @@ if __name__ == '__main__':
     cfg = setup(args)
 
     trainer = Trainer(cfg)
-    trainer.resume_or_load(resume=args.resume)
+    trainer.resume_or_load(resume=False)
     trainer.train()
-
-    cfg = get_cfg()
-    # for poly lr schedule
-    add_deeplab_config(cfg)
-    add_maskformer2_config(cfg)
-    cfg.merge_from_file("./detectron2/configs/COCO-Mask2former/instance-segmentation/swin/maskformer2_swin_base_384_bs16_50ep.yaml")
-    cfg.merge_from_list(args.opts)
-    cfg.freeze()
-    default_setup(cfg, args)
-    # Setup logger for "mask_former" module
-    setup_logger(output=cfg.OUTPUT_DIR, distributed_rank=comm.get_rank(), name="mask2former")
