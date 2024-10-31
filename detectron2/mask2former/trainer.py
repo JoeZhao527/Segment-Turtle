@@ -68,6 +68,7 @@ class Trainer(CustomTrainer):
     @classmethod
     def build_train_loader(cls, cfg):
         mapper = MaskFormerInstanceDatasetMapper(cfg, True)
+        return build_detection_train_loader(cfg, mapper=mapper)
 
     @classmethod
     def build_lr_scheduler(cls, cfg, optimizer):
