@@ -55,8 +55,8 @@ def prepare_model(cfg):
     cfg.MODEL.RETINANET.NUM_CLASSES = 3
     cfg.OUTPUT_DIR = "./output_mask2former"
     cfg.SOLVER.BASE_LR = 0.00025  # pick a good LR
-    cfg.SOLVER.MAX_ITER = 10
-    cfg.TEST.EVAL_PERIOD = 100
+    cfg.SOLVER.MAX_ITER = 10000
+    cfg.TEST.EVAL_PERIOD = 1000
 
 def setup(args):
     """
