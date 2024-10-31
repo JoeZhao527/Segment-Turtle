@@ -48,11 +48,12 @@ def setup(args):
     add_maskformer2_config(cfg)
     cfg.merge_from_file("./detectron2/configs/COCO-Mask2former/instance-segmentation/swin/maskformer2_swin_base_384_bs16_50ep.yaml")
     cfg.MODEL.WEIGHTS = "https://dl.fbaipublicfiles.com/maskformer/mask2former/coco/instance/maskformer2_swin_base_384_bs16_50ep/model_final_f6e0f6.pkl"
+    register_dataset(cfg)
     cfg.freeze()
     default_setup(cfg, args)
     # Setup logger for "mask_former" module
     setup_logger(output=cfg.OUTPUT_DIR, distributed_rank=comm.get_rank(), name="mask2former")
-    register_dataset(cfg)
+    
     return cfg
 
 
