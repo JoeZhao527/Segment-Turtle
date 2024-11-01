@@ -1,0 +1,27 @@
+MODEL:
+  META_ARCHITECTURE: "SemanticSegmentor"
+  BACKBONE:
+    NAME: "build_unet_backbone"
+    FREEZE_AT: 0
+    UNET_CHANNELS: [16, 32, 48, 64, 70]
+  SEM_SEG_HEAD:
+    NAME: "UnetSemSegHead"
+    NUM_CLASSES: 3
+    IGNORE_VALUE: 255
+DATASETS:
+  TRAIN: ("MyDataset_Train",)
+DATALOADER:
+  NUM_WORKERS: 8
+INPUT:
+  MIN_SIZE_TRAIN: (512, 768, 1024, 1280, 1536, 1792)
+  MIN_SIZE_TRAIN_SAMPLING: "choice"
+  MAX_SIZE_TRAIN: 4096
+  CROP:
+    ENABLED: True
+    TYPE: "absolute"
+    SIZE: (512, 512)
+SOLVER:
+  IMS_PER_BATCH: 16
+  BASE_LR: 0.01
+  MAX_ITER: 90000
+OUTPUT_DIR: './output_unet'
