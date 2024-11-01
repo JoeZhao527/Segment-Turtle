@@ -16,7 +16,7 @@ import os, json, cv2, random
 # import some common detectron2 utilities
 from detectron2 import model_zoo
 from detectron2.engine import DefaultPredictor
-from detectron2.engine.trainer import CustomTrainer
+from detectron2.engine.trainer import CustomTrainer, TurtleSemanticTrainer
 from detectron2.config import get_cfg
 from detectron2.utils.visualizer import Visualizer
 from detectron2.data import MetadataCatalog, DatasetCatalog
@@ -27,12 +27,12 @@ from detectron2.data import build_detection_test_loader
 
 # if your dataset is in COCO format, this cell can be replaced by the following three lines:
 from detectron2.data.datasets import register_coco_instances
-from detectron2.data.datasets.turtle_coco import split_n_prepare_turtle_coco, register_turtle_coco
+from detectron2.data.datasets.turtle_coco_semantic import register_turtle_coco, split_n_prepare_turtle_semantic_coco
 
 def register_dataset(cfg):
     base_dir = "./turtles-data/data"
 
-    datasets = split_n_prepare_turtle_coco(base_dir, dev_mode=True)
+    datasets = split_n_prepare_turtle_semantic_coco(base_dir, dev_mode=True)
 
     for _name, _data in datasets.items():
         register_turtle_coco(_data, _name, base_dir)
@@ -42,25 +42,28 @@ def register_dataset(cfg):
 
 
 def prepare_model(cfg):
-    cfg.merge_from_file(model_zoo.get_config_file("COCO-InstanceSegmentation/mask_rcnn_R_50_C4_3x.yaml"))
+    cfg.merge_from_file(model_zoo.get_config_file("Turtle-Semantic/unet-semantic.yaml"))
+
+    cfg.MODEL.BACKBONE.ENCODER_NAME = "resnet34"
+    cfg.MODEL.BACKBONE.WEIGHTS = "imagenet"
+    cfg.MODEL.BACKBONE.IN_CHANNELS = 3
+    cfg.MODEL.BACKBONE.NUM_CLASSES = 4
+    cfg.MODEL.BACKBONE.SIZE_DIVISIBILITY = 32
 
     # Switch the valid and test split, as the detectron2 uses cfg.DATASETS.TEST for validation
     cfg.DATASETS.TRAIN = ("turtle_parts_train",)
     cfg.DATASETS.TEST = ("turtle_parts_valid",)
 
-    cfg.DATALOADER.NUM_WORKERS = 0
-    cfg.MODEL.WEIGHTS = model_zoo.get_checkpoint_url("COCO-InstanceSegmentation/mask_rcnn_R_50_C4_3x.yaml")
+    cfg.DATALOADER.NUM_WORKERS = 2
 
     cfg.SOLVER.IMS_PER_BATCH = 4  # This is the real "batch size" commonly known to deep learning people
     cfg.SOLVER.BASE_LR = 0.00025  # pick a good LR
-    cfg.SOLVER.MAX_ITER = 10000   # 300 iterations seems good enough for this toy dataset; you will need to train longer for a practical dataset
+    cfg.SOLVER.MAX_ITER = 100   # 300 iterations seems good enough for this toy dataset; you will need to train longer for a practical dataset
     cfg.SOLVER.STEPS = []        # do not decay learning rate
-    cfg.MODEL.ROI_HEADS.BATCH_SIZE_PER_IMAGE = 32   # The "RoIHead batch size". 128 is faster, and good enough for this toy dataset (default: 512)
-    cfg.MODEL.ROI_HEADS.NUM_CLASSES = 3  # only has one class (ballon). (see https://detectron2.readthedocs.io/tutorials/datasets.html#update-the-config-for-new-datasets)
+    
     cfg.MODEL.DEVICE = 'cuda' if torch.cuda.is_available() else 'cpu'
-    cfg.TEST.EVAL_PERIOD = 1000
-    cfg.INPUT.MASK_FORMAT = 'bitmask'
-    cfg.OUTPUT_DIR = "./output_mask_rcnn"
+    cfg.TEST.EVAL_PERIOD = 20
+    cfg.OUTPUT_DIR = "./output_unet"
     
 def setup():
     cfg = get_cfg()
@@ -73,7 +76,7 @@ def setup():
 if __name__ == '__main__':
     cfg = setup()
 
-    trainer = CustomTrainer(cfg)
+    trainer = TurtleSemanticTrainer(cfg)
     trainer.resume_or_load(resume=False)
     trainer.train()
 
@@ -81,6 +84,6 @@ if __name__ == '__main__':
     cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = 0.7   # set a custom testing threshold
     predictor = DefaultPredictor(cfg)
 
-    evaluator = TurtleCOCOEvaluator("turtle_parts_test", output_dir="./output")
+    evaluator = TurtleCOCOEvaluator("turtle_parts_test", output_dir=cfg.OUTPUT_DIR)
     tst_loader = build_detection_test_loader(cfg, "turtle_parts_test")
     print(inference_on_dataset(predictor.model, tst_loader, evaluator))

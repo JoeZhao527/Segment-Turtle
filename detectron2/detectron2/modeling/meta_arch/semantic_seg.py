@@ -265,3 +265,19 @@ class SemSegFPNHead(nn.Module):
         )
         losses = {"loss_sem_seg": loss * self.loss_weight}
         return losses
+
+
+@SEM_SEG_HEADS_REGISTRY.register()
+class SMPSemSegHead(nn.Module):
+    def __init__(self, cfg, _):
+        super().__init__()
+        self.criterion = nn.CrossEntropyLoss()
+        
+        self.ignore_value = cfg.MODEL.SEM_SEG_HEAD.IGNORE_VALUE
+
+    def forward(self, x, targets=None):
+        if self.training:
+            loss = self.criterion(x, targets)
+            return None, {"loss_sem_seg": loss}
+        else:
+            return F.softmax(x, dim=1), {}

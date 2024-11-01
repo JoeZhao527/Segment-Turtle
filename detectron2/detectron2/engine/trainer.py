@@ -1,7 +1,9 @@
 from detectron2.engine import DefaultTrainer, hooks
 from detectron2.evaluation import COCOEvaluator, inference_on_dataset
 from detectron2.evaluation.turtle_coco_evaluation import TurtleCOCOEvaluator
-from detectron2.data import build_detection_test_loader
+from detectron2.data import build_detection_test_loader, build_detection_train_loader
+from detectron2.data.dataset_mapper import TurtleSemanticDatasetMapper
+import detectron2.data.transforms as T
 import os
 
 class BestCheckpointer(hooks.BestCheckpointer):
@@ -24,5 +26,33 @@ class CustomTrainer(DefaultTrainer):
         return super().test(cfg, model, evaluators=TurtleCOCOEvaluator(
             cfg.DATASETS.TEST[0], output_dir=cfg.OUTPUT_DIR
         ))
-    
+
+
+def build_sem_seg_train_aug(cfg):
+    augs = [
+        T.ResizeShortestEdge(
+            cfg.INPUT.MIN_SIZE_TRAIN,
+            cfg.INPUT.MAX_SIZE_TRAIN,
+            cfg.INPUT.MIN_SIZE_TRAIN_SAMPLING,
+        )
+    ]
+    if cfg.INPUT.CROP.ENABLED:
+        augs.append(
+            T.RandomCrop_CategoryAreaConstraint(
+                cfg.INPUT.CROP.TYPE,
+                cfg.INPUT.CROP.SIZE,
+                cfg.INPUT.CROP.SINGLE_CATEGORY_MAX_AREA,
+                cfg.MODEL.SEM_SEG_HEAD.IGNORE_VALUE,
+            )
+        )
+    augs.append(T.RandomFlip())
+    return augs
+
+
+class TurtleSemanticTrainer(CustomTrainer):
+    @classmethod
+    def build_train_loader(cls, cfg):
+        mapper = TurtleSemanticDatasetMapper(cfg, is_train=True, augmentations=build_sem_seg_train_aug(cfg))
+        return build_detection_train_loader(cfg, mapper=mapper)
+
 

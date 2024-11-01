@@ -219,8 +219,9 @@ class TurtleSemanticDatasetMapper(DatasetMapper):
         # but not efficient on large generic data structures due to the use of pickle & mp.Queue.
         # Therefore it's important to use torch.Tensor.
         dataset_dict["image"] = torch.as_tensor(np.ascontiguousarray(image.transpose(2, 0, 1)))
-        if sem_seg_gt is not None:
-            dataset_dict["sem_seg"] = torch.as_tensor(sem_seg_gt.astype("long"))
+
+        # We have to have semantic segmentation mask, the class is for semantic segmentation only
+        dataset_dict["sem_seg"] = torch.as_tensor(sem_seg_gt.astype("long"))
 
         # USER: Remove if you don't use pre-computed proposals.
         # Most users would not need this feature.
