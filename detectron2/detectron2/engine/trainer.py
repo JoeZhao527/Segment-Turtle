@@ -1,6 +1,8 @@
 from detectron2.engine import DefaultTrainer, hooks
 from detectron2.evaluation import COCOEvaluator, inference_on_dataset
 from detectron2.evaluation.turtle_coco_evaluation import TurtleCOCOEvaluator
+from detectron2.evaluation.turtle_coco_semantic_evaluation import TurtleSemSegEvaluator
+from detectron2.evaluation.sem_seg_evaluation import SemSegEvaluator
 from detectron2.data import build_detection_test_loader, build_detection_train_loader
 from detectron2.data.dataset_mapper import TurtleSemanticDatasetMapper
 import detectron2.data.transforms as T
@@ -52,7 +54,11 @@ def build_sem_seg_train_aug(cfg):
 class TurtleSemanticTrainer(CustomTrainer):
     @classmethod
     def build_train_loader(cls, cfg):
-        mapper = TurtleSemanticDatasetMapper(cfg, is_train=True, augmentations=build_sem_seg_train_aug(cfg))
+        mapper = TurtleSemanticDatasetMapper(cfg, is_train=True)
         return build_detection_train_loader(cfg, mapper=mapper)
 
-
+    @classmethod
+    def test(cls, cfg, model, evaluator=None):
+        return super().test(cfg, model, evaluators=TurtleSemSegEvaluator(
+            cfg.DATASETS.TEST[0], output_dir=cfg.OUTPUT_DIR
+        ))

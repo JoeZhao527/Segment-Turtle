@@ -33,6 +33,9 @@ class TurtleCOCOEvaluator(COCOEvaluator):
         self.turle_mask_predictions = {}
 
     def process(self, inputs, outputs):
+        # Always reset when processing
+        self.turle_mask_predictions = {}
+
         for input, output in zip(inputs, outputs):
             # Extract instances from the output
             instances = output["instances"]
@@ -47,9 +50,18 @@ class TurtleCOCOEvaluator(COCOEvaluator):
             # Create a dictionary to hold the masks for each unique class
             class_masks = {}
 
+            # unmap the category ids for COCO
+            dataset_id_to_contiguous_id = self._metadata.thing_dataset_id_to_contiguous_id
+            all_contiguous_ids = list(dataset_id_to_contiguous_id.values())
+            num_classes = len(all_contiguous_ids)
+            assert min(all_contiguous_ids) == 0 and max(all_contiguous_ids) == num_classes - 1
+
+            reverse_id_mapping = {v: k for k, v in dataset_id_to_contiguous_id.items()}
+
             # Perform logical OR for each class using tensor operations
             for class_id in unique_classes:
-                class_masks[class_id.item() + 1] = torch.any(
+                cat_id = reverse_id_mapping[class_id.item()]
+                class_masks[cat_id] = torch.any(
                     pred_masks[pred_classes == class_id], dim=0
                 ).detach().cpu().numpy()
 
@@ -63,6 +75,12 @@ class TurtleCOCOEvaluator(COCOEvaluator):
             gt=self.ground_truth_mask,
             pred=self.turle_mask_predictions
         )
+
+        if self._output_dir:
+            PathManager.mkdirs(self._output_dir)
+            file_path = os.path.join(self._output_dir, "coco_instances_results.json")
+            with PathManager.open(file_path, "w") as f:
+                f.write(json.dumps(self.turle_mask_predictions))
 
         turtle_miou = np.array(list(eval_result[1].values())).mean()
         flippers_miou = np.array(list(eval_result[2].values())).mean()
