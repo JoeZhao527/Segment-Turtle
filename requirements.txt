@@ -25,10 +25,10 @@ setuptools==75.1.0
 Shapely==2.0.6
 tabulate==0.9.0
 termcolor==2.5.0
-timm==1.0.11
 torch==2.1.0
 torchvision==0.16.0
 tqdm==4.66.5
 pandas==2.2.3
 tensorboard==2.18.0
-timm==1.0.11
+timm==0.9.7
+segmentation-models-pytorch==0.3.4
