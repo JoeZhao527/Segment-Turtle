@@ -45,7 +45,10 @@ class TurtleSemSegEvaluator(SemSegEvaluator):
             pred = np.array(output, dtype=int)
 
             gt = input["sem_seg"].to(self._cpu_device).numpy()
-
+            print(input)
+            print(gt.shape)
+            print(pred.shape)
+            exit(0)
             self.turle_mask_predictions = {
                 **self.turle_mask_predictions,
                 input["image_id"]: {

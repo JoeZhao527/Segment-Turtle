@@ -97,8 +97,6 @@ class SemanticSegmentor(nn.Module):
               The prediction has shape KxHxW that represents the logits of
               each class for each pixel.
         """
-        print(batched_inputs[0])
-        exit(0)
         images = [x["image"].to(self.device) for x in batched_inputs]
         images = [(x - self.pixel_mean) / self.pixel_std for x in images]
         images = ImageList.from_tensors(
