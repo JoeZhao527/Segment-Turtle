@@ -78,7 +78,11 @@ class TurtleCOCOEvaluator(COCOEvaluator):
             gt=self.ground_truth_mask,
             pred=self.turle_mask_predictions
         )
-
+        for k0 in self.turle_mask_predictions:
+            for k in self.turle_mask_predictions[k0]:
+                print(k, type(self.turle_mask_predictions[k0][k]))
+            break
+        
         if self._output_dir:
             PathManager.mkdirs(self._output_dir)
             file_path = os.path.join(self._output_dir, "coco_instances_results.json")
