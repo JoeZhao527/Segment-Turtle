@@ -23,6 +23,7 @@ from detectron2.data import MetadataCatalog, DatasetCatalog
 
 from detectron2.evaluation import COCOEvaluator, inference_on_dataset
 from detectron2.evaluation.turtle_coco_evaluation import TurtleCOCOEvaluator
+from detectron2.evaluation.turtle_coco_semantic_evaluation import TurtleSemSegEvaluator
 from detectron2.data import build_detection_test_loader
 
 # if your dataset is in COCO format, this cell can be replaced by the following three lines:
@@ -84,6 +85,6 @@ if __name__ == '__main__':
     cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = 0.7   # set a custom testing threshold
     predictor = DefaultPredictor(cfg)
 
-    evaluator = TurtleCOCOEvaluator("turtle_parts_test", output_dir=cfg.OUTPUT_DIR)
+    evaluator = TurtleSemSegEvaluator("turtle_parts_test", output_dir=cfg.OUTPUT_DIR)
     tst_loader = build_detection_test_loader(cfg, "turtle_parts_test")
     print(inference_on_dataset(predictor.model, tst_loader, evaluator))
