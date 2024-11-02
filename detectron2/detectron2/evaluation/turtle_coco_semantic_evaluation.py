@@ -26,48 +26,14 @@ class TurtleSemSegEvaluator(SemSegEvaluator):
         output_dir=None,
         *,
         sem_seg_loading_fn=None,
-        num_classes=None,
+        num_classes=3,
         ignore_label=None,
     ):
-        """
-        Args:
-            dataset_name (str): name of the dataset to be evaluated.
-            distributed (bool): if True, will collect results from all ranks for evaluation.
-                Otherwise, will evaluate the results in the current process.
-            output_dir (str): an output directory to dump results.
-            sem_seg_loading_fn: function to read sem seg file and load into numpy array.
-                Default provided, but projects can customize.
-            num_classes, ignore_label: deprecated argument
-        """
         self._logger = logging.getLogger(__name__)
-        if num_classes is not None:
-            self._logger.warn(
-                "SemSegEvaluator(num_classes) is deprecated! It should be obtained from metadata."
-            )
-        if ignore_label is not None:
-            self._logger.warn(
-                "SemSegEvaluator(ignore_label) is deprecated! It should be obtained from metadata."
-            )
+
         self._dataset_name = dataset_name
-        self._distributed = distributed
         self._output_dir = output_dir
-
-        self._cpu_device = torch.device("cpu")
-
-        meta = MetadataCatalog.get(dataset_name)
-        # Dict that maps contiguous training ids to COCO category ids
-        try:
-            c2d = meta.stuff_dataset_id_to_contiguous_id
-            self._contiguous_id_to_dataset_id = {v: k for k, v in c2d.items()}
-        except AttributeError:
-            self._contiguous_id_to_dataset_id = None
-        self._class_names = meta.stuff_classes
-        self.sem_seg_loading_fn = sem_seg_loading_fn
-        self._num_classes = len(meta.stuff_classes)
-        if num_classes is not None:
-            assert self._num_classes == num_classes, f"{self._num_classes} != {num_classes}"
-        self._ignore_label = ignore_label if ignore_label is not None else meta.ignore_label
-
+        self._num_classes = num_classes
         self.turle_mask_predictions = {}
 
     def process(self, inputs, outputs):
@@ -78,8 +44,6 @@ class TurtleSemSegEvaluator(SemSegEvaluator):
             pred = np.array(output, dtype=int)
 
             gt = input["sem_seg"]
-
-            gt[gt == self._ignore_label] = self._num_classes
 
             self.turle_mask_predictions = {
                 **self.turle_mask_predictions,
