@@ -31,6 +31,7 @@ class TurtleSemSegEvaluator(SemSegEvaluator):
     ):
         self._logger = logging.getLogger(__name__)
 
+        self._cpu_device = "cpu"
         self._dataset_name = dataset_name
         self._output_dir = output_dir
         self._num_classes = num_classes
