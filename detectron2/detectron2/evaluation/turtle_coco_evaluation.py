@@ -33,9 +33,6 @@ class TurtleCOCOEvaluator(COCOEvaluator):
         self.turle_mask_predictions = {}
 
     def process(self, inputs, outputs):
-        # Always reset when processing
-        self.turle_mask_predictions = {}
-
         for input, output in zip(inputs, outputs):
             # Extract instances from the output
             instances = output["instances"]
