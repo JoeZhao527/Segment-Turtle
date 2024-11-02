@@ -210,6 +210,10 @@ class TurtleSemanticDatasetMapper(DatasetMapper):
 
         sem_seg_gt = dataset_dict.pop("sem_seg")
 
+        # As we do not have a file path to store the original resolution ground truth, we have
+        # to store that in memory during training
+        sem_seg_gt_original_resolution = sem_seg_gt.copy()
+
         aug_input = T.AugInput(image, sem_seg=sem_seg_gt)
         transforms = self.augmentations(aug_input)
         image, sem_seg_gt = aug_input.image, aug_input.sem_seg
@@ -220,9 +224,13 @@ class TurtleSemanticDatasetMapper(DatasetMapper):
         # Therefore it's important to use torch.Tensor.
         dataset_dict["image"] = torch.as_tensor(np.ascontiguousarray(image.transpose(2, 0, 1)))
 
-        # We have to have semantic segmentation mask, the class is for semantic segmentation only
+        # sem_seg: augmented / cropped mask
         dataset_dict["sem_seg"] = torch.as_tensor(sem_seg_gt.astype("long"))
-        
+
+        # sem_seg_gt_original_resolution: original resolution mask. Since it only uses
+        # for evalution, keep that as numpy array
+        dataset_dict["sem_seg_gt"] = sem_seg_gt_original_resolution
+
         # USER: Remove if you don't use pre-computed proposals.
         # Most users would not need this feature.
         if self.proposal_topk is not None:

@@ -44,11 +44,10 @@ class TurtleSemSegEvaluator(SemSegEvaluator):
             output = output["sem_seg"].argmax(dim=0).to(self._cpu_device)
             pred = np.array(output, dtype=int)
 
-            gt = input["sem_seg"].to(self._cpu_device).numpy()
-            print(input)
-            print(gt.shape)
-            print(pred.shape)
-            exit(0)
+            # original resolution ground truth is in numpy.array.
+            # Reference to data.dataset_mapper.TurtleSemanticDatasetMapper
+            gt = input["sem_seg_gt"]
+
             self.turle_mask_predictions = {
                 **self.turle_mask_predictions,
                 input["image_id"]: {
