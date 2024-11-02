@@ -58,9 +58,15 @@ class TurtleCOCOEvaluator(COCOEvaluator):
             # Perform logical OR for each class using tensor operations
             for class_id in unique_classes:
                 cat_id = reverse_id_mapping[class_id.item()]
-                class_masks[cat_id] = torch.any(
+                _mask = torch.any(
                     pred_masks[pred_classes == class_id], dim=0
                 ).detach().cpu().numpy()
+
+                # Convert RLE counts from bytes to a UTF-8 string for JSON serialization
+                _mask = mask_util.encode(np.asfortranarray(_mask.astype(np.uint8)))
+                _mask["count"] = _mask["counts"].decode("utf-8")
+
+                class_masks[cat_id] = _mask
 
             # Update the predictions dictionary with the computed masks for the current image
             self.turle_mask_predictions = {**self.turle_mask_predictions, input["image_id"]: class_masks}
@@ -118,9 +124,13 @@ def compute_iou(gt, pred):
             gt_mask = cats[cat_id]
             pred_mask = get_mask(pred, img_id, cat_id)
             
-            if pred_mask is None:
+            # Convert pred_mask from RLE to a NumPy array if it exists
+            if pred_mask is not None:
+                pred_mask = mask_util.decode(pred_mask)
+            else:
                 pred_mask = np.zeros_like(gt_mask)
-                
+
+            # Calculate IoU and store the result
             results[cat_id][img_id] = iou(gt_mask, pred_mask)
             
     return results
