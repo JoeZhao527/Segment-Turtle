@@ -52,7 +52,7 @@ def load_coco_api_semantic(coco_api, image_root, dataset_name=None, extra_annota
 
     num_instances_without_valid_segmentation = 0
 
-    for img_dict, anno_dict_list in imgs_anns:
+    for img_dict, anno_dict_list in tqdm(imgs_anns, desc=f"Preparing semantic segmentation mask"):
         record = {}
         record["file_name"] = os.path.join(image_root, img_dict["file_name"])
         record["height"] = img_dict["height"]
@@ -178,9 +178,9 @@ def split_n_prepare_turtle_semantic_coco(data_dir: str, dev_mode: bool = False):
         logger.info(f"Preprocessing and registering for {split_name} data...")
 
         # Process and register the whole turtle dataset
-        _data_name = f"turtle_whole_{split_name}"
-        split_coco_whole = create_split_coco(img_ids, coco, process_body_parts=False)
-        datasets[_data_name] = load_coco_api_semantic(split_coco_whole, data_dir, _data_name)
+        # _data_name = f"turtle_whole_{split_name}"
+        # split_coco_whole = create_split_coco(img_ids, coco, process_body_parts=False)
+        # datasets[_data_name] = load_coco_api_semantic(split_coco_whole, data_dir, _data_name)
 
         # Process and register the turtle body parts dataset
         _data_name = f"turtle_parts_{split_name}"
@@ -213,7 +213,7 @@ def create_split_coco(img_ids, coco, process_body_parts):
         COCO: Processed COCO object for the dataset split.
     """
     split_annotations = {}
-    for img_id in tqdm(img_ids, desc="Preprocessing bbox and masks"):
+    for img_id in img_ids:
         anns = coco.imgToAnns[img_id]
 
         if process_body_parts:
