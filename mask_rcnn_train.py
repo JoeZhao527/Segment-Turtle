@@ -48,7 +48,7 @@ def prepare_model(cfg):
     cfg.DATASETS.TRAIN = ("turtle_parts_train",)
     cfg.DATASETS.TEST = ("turtle_parts_valid",)
 
-    cfg.DATALOADER.NUM_WORKERS = 0
+    cfg.DATALOADER.NUM_WORKERS = 1
     cfg.MODEL.WEIGHTS = model_zoo.get_checkpoint_url("COCO-InstanceSegmentation/mask_rcnn_R_50_C4_3x.yaml")
 
     cfg.SOLVER.IMS_PER_BATCH = 4  # This is the real "batch size" commonly known to deep learning people
