@@ -38,8 +38,6 @@ class TurtleSemSegEvaluator(SemSegEvaluator):
         self.turle_mask_predictions = {}
 
     def process(self, inputs, outputs):
-        self.turle_mask_predictions = {}
-
         for input, output in zip(inputs, outputs):
             output = output["sem_seg"].argmax(dim=0).to(self._cpu_device)
             pred = np.array(output, dtype=int)
