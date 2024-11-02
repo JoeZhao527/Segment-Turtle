@@ -51,8 +51,8 @@ class TurtleSemSegEvaluator(SemSegEvaluator):
             self.turle_mask_predictions = {
                 **self.turle_mask_predictions,
                 input["image_id"]: {
-                    "gt": gt,
-                    "pred": pred,
+                    "gt": mask_util.encode(np.asfortranarray(gt.astype(np.uint8))),
+                    "pred": mask_util.encode(np.asfortranarray(pred.astype(np.uint8))),
                     "turtle_iou": compute_iou(pred, gt, 1),
                     "flippers_iou": compute_iou(pred, gt, 2),
                     "head_iou": compute_iou(pred, gt, 3),
