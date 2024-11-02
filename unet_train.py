@@ -34,7 +34,7 @@ from detectron2.data.datasets.turtle_coco_semantic import register_turtle_coco, 
 def register_dataset(cfg):
     base_dir = "./turtles-data/data"
 
-    datasets = split_n_prepare_turtle_semantic_coco(base_dir, dev_mode=False)
+    datasets = split_n_prepare_turtle_semantic_coco(base_dir, dev_mode=True)
 
     for _name, _data in datasets.items():
         register_turtle_coco(_data, _name, base_dir)
