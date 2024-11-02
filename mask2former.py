@@ -48,14 +48,14 @@ def prepare_model(cfg):
     cfg.MODEL.WEIGHTS = "https://dl.fbaipublicfiles.com/maskformer/mask2former/coco/instance/maskformer2_swin_tiny_bs16_50ep/model_final_86143f.pkl"
     cfg.DATALOADER.NUM_WORKERS = 0
     cfg.SOLVER.IMS_PER_BATCH = 2
-    cfg.MODEL.ROI_HEADS.BATCH_SIZE_PER_IMAGE = 32
+    cfg.MODEL.ROI_HEADS.BATCH_SIZE_PER_IMAGE = 16
     cfg.MODEL.ROI_HEADS.NUM_CLASSES = 3
     cfg.MODEL.ROI_BOX_HEAD.FED_LOSS_NUM_CLASSES = 3
     cfg.MODEL.SEM_SEG_HEAD.NUM_CLASSES = 3
     cfg.MODEL.RETINANET.NUM_CLASSES = 3
     cfg.OUTPUT_DIR = "./output_mask2former"
     cfg.SOLVER.BASE_LR = 0.00025  # pick a good LR
-    cfg.SOLVER.MAX_ITER = 10000
+    cfg.SOLVER.MAX_ITER = 20000
     cfg.TEST.EVAL_PERIOD = 1000
 
 def setup(args):
