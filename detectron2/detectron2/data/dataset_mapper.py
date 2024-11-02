@@ -223,6 +223,9 @@ class TurtleSemanticDatasetMapper(DatasetMapper):
         # We have to have semantic segmentation mask, the class is for semantic segmentation only
         dataset_dict["sem_seg"] = torch.as_tensor(sem_seg_gt.astype("long"))
 
+        # No using of sem_seg_file_name, this is to make the evaluator
+        dataset_dict["sem_seg_file_name"] = ""
+
         # USER: Remove if you don't use pre-computed proposals.
         # Most users would not need this feature.
         if self.proposal_topk is not None:
