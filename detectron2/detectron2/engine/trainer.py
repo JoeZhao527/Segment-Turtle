@@ -68,6 +68,11 @@ class TurtleSemanticTrainer(DefaultTrainer):
         return build_detection_train_loader(cfg, mapper=mapper)
 
     @classmethod
+    def build_test_loader(cls, cfg, dataset_name):
+        mapper = TurtleSemanticDatasetMapper(cfg, is_train=True)
+        return build_detection_test_loader(cfg, dataset_name, mapper=mapper)
+    
+    @classmethod
     def test(cls, cfg, model, evaluator=None):
         return super().test(cfg, model, evaluators=TurtleSemSegEvaluator(
             cfg.DATASETS.TEST[0], output_dir=cfg.OUTPUT_DIR
