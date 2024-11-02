@@ -51,7 +51,17 @@ def build_sem_seg_train_aug(cfg):
     return augs
 
 
-class TurtleSemanticTrainer(CustomTrainer):
+class TurtleSemanticTrainer(DefaultTrainer):
+    def build_hooks(self):
+        hooks = super().build_hooks()
+        hooks.insert(-1, BestCheckpointer(
+            self.cfg.TEST.EVAL_PERIOD,
+            self.checkpointer,
+            "average_miou",
+            mode="max",
+        ))
+        return hooks
+    
     @classmethod
     def build_train_loader(cls, cfg):
         mapper = TurtleSemanticDatasetMapper(cfg, is_train=True)
