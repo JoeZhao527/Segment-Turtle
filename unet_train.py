@@ -60,11 +60,11 @@ def prepare_model(cfg):
 
     cfg.SOLVER.IMS_PER_BATCH = 2  # This is the real "batch size" commonly known to deep learning people
     cfg.SOLVER.BASE_LR = 0.00025  # pick a good LR
-    cfg.SOLVER.MAX_ITER = 20000   # 300 iterations seems good enough for this toy dataset; you will need to train longer for a practical dataset
+    cfg.SOLVER.MAX_ITER = 20   # 300 iterations seems good enough for this toy dataset; you will need to train longer for a practical dataset
     cfg.SOLVER.STEPS = []        # do not decay learning rate
     
     cfg.MODEL.DEVICE = 'cuda' if torch.cuda.is_available() else 'cpu'
-    cfg.TEST.EVAL_PERIOD = 1000
+    cfg.TEST.EVAL_PERIOD = 10
     cfg.OUTPUT_DIR = "./output_unet"
     
 def setup():
