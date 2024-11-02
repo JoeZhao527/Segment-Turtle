@@ -28,7 +28,7 @@ class Deeplab(Backbone):
         self.net.classifier[4] = nn.Conv2d(256, num_categories, kernel_size=(1, 1))
 
     def forward(self, x):
-        return self.net(x)
+        return self.net(x)['out']
     
     def output_shape(self):
         return None
