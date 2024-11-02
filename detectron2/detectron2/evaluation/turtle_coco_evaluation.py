@@ -64,7 +64,7 @@ class TurtleCOCOEvaluator(COCOEvaluator):
 
                 # Convert RLE counts from bytes to a UTF-8 string for JSON serialization
                 _mask = mask_util.encode(np.asfortranarray(_mask.astype(np.uint8)))
-                _mask["count"] = _mask["counts"].decode("utf-8")
+                _mask["counts"] = _mask["counts"].decode("utf-8")
 
                 class_masks[cat_id] = _mask
 
@@ -78,10 +78,6 @@ class TurtleCOCOEvaluator(COCOEvaluator):
             gt=self.ground_truth_mask,
             pred=self.turle_mask_predictions
         )
-        for k0 in self.turle_mask_predictions:
-            for k in self.turle_mask_predictions[k0]:
-                print(k, type(self.turle_mask_predictions[k0][k]))
-            break
         
         if self._output_dir:
             PathManager.mkdirs(self._output_dir)
