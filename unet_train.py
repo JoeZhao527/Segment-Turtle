@@ -34,7 +34,7 @@ from detectron2.data.datasets.turtle_coco_semantic import register_turtle_coco, 
 def register_dataset(cfg):
     base_dir = "./turtles-data/data"
 
-    datasets = split_n_prepare_turtle_semantic_coco(base_dir, dev_mode=True)
+    datasets = split_n_prepare_turtle_semantic_coco(base_dir, dev_mode=False)
 
     for _name, _data in datasets.items():
         register_turtle_coco(_data, _name, base_dir)
@@ -60,11 +60,11 @@ def prepare_model(cfg):
 
     cfg.SOLVER.IMS_PER_BATCH = 2  # This is the real "batch size" commonly known to deep learning people
     cfg.SOLVER.BASE_LR = 0.00025  # pick a good LR
-    cfg.SOLVER.MAX_ITER = 20   # 300 iterations seems good enough for this toy dataset; you will need to train longer for a practical dataset
+    cfg.SOLVER.MAX_ITER = 20000   # 300 iterations seems good enough for this toy dataset; you will need to train longer for a practical dataset
     cfg.SOLVER.STEPS = []        # do not decay learning rate
     
     cfg.MODEL.DEVICE = 'cuda' if torch.cuda.is_available() else 'cpu'
-    cfg.TEST.EVAL_PERIOD = 10
+    cfg.TEST.EVAL_PERIOD = 1000
     cfg.OUTPUT_DIR = "./output_unet"
     
 def setup():

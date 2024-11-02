@@ -29,7 +29,7 @@ This file contains functions to parse COCO-format annotations into dicts in "Det
 
 logger = logging.getLogger(__name__)
 
-def load_coco_api_semantic(coco_api, image_root, dataset_name=None, extra_annotation_keys=None, use_ann: bool = False):
+def load_coco_api_semantic(coco_api, image_root, dataset_name=None, extra_annotation_keys=None):
     # sort indices for reproducible results
     img_ids = sorted(coco_api.imgs.keys())
     imgs = coco_api.loadImgs(img_ids)
@@ -58,51 +58,50 @@ def load_coco_api_semantic(coco_api, image_root, dataset_name=None, extra_annota
         record["height"] = img_dict["height"]
         record["width"] = img_dict["width"]
         image_id = record["image_id"] = img_dict["id"]
+        
+        objs = []
+        for anno in anno_dict_list:
+            assert anno["image_id"] == image_id
 
-        if use_ann:
-            objs = []
-            for anno in anno_dict_list:
-                assert anno["image_id"] == image_id
+            assert anno.get("ignore", 0) == 0, '"ignore" in COCO json file is not supported.'
 
-                assert anno.get("ignore", 0) == 0, '"ignore" in COCO json file is not supported.'
+            obj = {key: anno[key] for key in ann_keys if key in anno}
+            if "bbox" in obj and len(obj["bbox"]) == 0:
+                raise ValueError(
+                    f"One annotation of image {image_id} contains empty 'bbox' value! "
+                    "This json does not have valid COCO format."
+                )
 
-                obj = {key: anno[key] for key in ann_keys if key in anno}
-                if "bbox" in obj and len(obj["bbox"]) == 0:
-                    raise ValueError(
-                        f"One annotation of image {image_id} contains empty 'bbox' value! "
-                        "This json does not have valid COCO format."
-                    )
+            segm = anno.get("segmentation", None)
+            if segm:  # either list[list[float]] or dict(RLE)
+                if isinstance(segm, dict):
+                    if isinstance(segm["counts"], list):
+                        # convert to compressed RLE
+                        segm = mask_util.frPyObjects(segm, *segm["size"])
+                else:
+                    # filter out invalid polygons (< 3 points)
+                    segm = [poly for poly in segm if len(poly) % 2 == 0 and len(poly) >= 6]
+                    if len(segm) == 0:
+                        num_instances_without_valid_segmentation += 1
+                        continue  # ignore this instance
+                obj["segmentation"] = segm
 
-                segm = anno.get("segmentation", None)
-                if segm:  # either list[list[float]] or dict(RLE)
-                    if isinstance(segm, dict):
-                        if isinstance(segm["counts"], list):
-                            # convert to compressed RLE
-                            segm = mask_util.frPyObjects(segm, *segm["size"])
-                    else:
-                        # filter out invalid polygons (< 3 points)
-                        segm = [poly for poly in segm if len(poly) % 2 == 0 and len(poly) >= 6]
-                        if len(segm) == 0:
-                            num_instances_without_valid_segmentation += 1
-                            continue  # ignore this instance
-                    obj["segmentation"] = segm
+            keypts = anno.get("keypoints", None)
+            if keypts:  # list[int]
+                for idx, v in enumerate(keypts):
+                    if idx % 3 != 2:
+                        # COCO's segmentation coordinates are floating points in [0, H or W],
+                        # but keypoint coordinates are integers in [0, H-1 or W-1]
+                        # Therefore we assume the coordinates are "pixel indices" and
+                        # add 0.5 to convert to floating point coordinates.
+                        keypts[idx] = v + 0.5
+                obj["keypoints"] = keypts
 
-                keypts = anno.get("keypoints", None)
-                if keypts:  # list[int]
-                    for idx, v in enumerate(keypts):
-                        if idx % 3 != 2:
-                            # COCO's segmentation coordinates are floating points in [0, H or W],
-                            # but keypoint coordinates are integers in [0, H-1 or W-1]
-                            # Therefore we assume the coordinates are "pixel indices" and
-                            # add 0.5 to convert to floating point coordinates.
-                            keypts[idx] = v + 0.5
-                    obj["keypoints"] = keypts
+            obj["bbox_mode"] = BoxMode.XYWH_ABS
 
-                obj["bbox_mode"] = BoxMode.XYWH_ABS
+            objs.append(obj)
 
-                objs.append(obj)
-
-            record["annotations"] = objs
+        record["annotations"] = objs
 
         # Prepare semantic segmentation mask
         record['sem_seg'] = process_semantic_mask(record)
