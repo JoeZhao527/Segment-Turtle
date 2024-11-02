@@ -48,11 +48,19 @@ class TurtleSemSegEvaluator(SemSegEvaluator):
             # Reference to data.dataset_mapper.TurtleSemanticDatasetMapper
             gt = input["sem_seg_gt"]
 
+            # Convert pred and gt to RLE format
+            pred_rle = mask_util.encode(np.asfortranarray(pred.astype(np.uint8)))
+            gt_rle = mask_util.encode(np.asfortranarray(gt.astype(np.uint8)))
+
+            # Convert RLE counts from bytes to a UTF-8 string for JSON serialization
+            pred_rle["counts"] = pred_rle["counts"].decode("utf-8")
+            gt_rle["counts"] = gt_rle["counts"].decode("utf-8")
+
             self.turle_mask_predictions = {
                 **self.turle_mask_predictions,
                 input["image_id"]: {
-                    "gt": mask_util.encode(np.asfortranarray(gt.astype(np.uint8))),
-                    "pred": mask_util.encode(np.asfortranarray(pred.astype(np.uint8))),
+                    "gt": gt_rle,
+                    "pred": pred_rle,
                     "turtle_iou": compute_iou(pred, gt, 1),
                     "flippers_iou": compute_iou(pred, gt, 2),
                     "head_iou": compute_iou(pred, gt, 3),
