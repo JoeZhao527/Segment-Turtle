@@ -20,6 +20,7 @@ from detectron2.engine.trainer import CustomTrainer, TurtleSemanticTrainer
 from detectron2.config import get_cfg
 from detectron2.utils.visualizer import Visualizer
 from detectron2.data import MetadataCatalog, DatasetCatalog
+from detectron2.data.dataset_mapper import TurtleSemanticDatasetMapper
 
 from detectron2.evaluation import COCOEvaluator, inference_on_dataset
 from detectron2.evaluation.turtle_coco_evaluation import TurtleCOCOEvaluator
@@ -86,5 +87,6 @@ if __name__ == '__main__':
     predictor = DefaultPredictor(cfg)
 
     evaluator = TurtleSemSegEvaluator("turtle_parts_test", output_dir=cfg.OUTPUT_DIR)
-    tst_loader = build_detection_test_loader(cfg, "turtle_parts_test")
+    mapper = TurtleSemanticDatasetMapper(cfg, is_train=True)
+    tst_loader = build_detection_test_loader(cfg, "turtle_parts_test", mapper=mapper)
     print(inference_on_dataset(predictor.model, tst_loader, evaluator))
