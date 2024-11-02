@@ -77,6 +77,8 @@ class TurtleSemSegEvaluator(SemSegEvaluator):
         flippers_ious = [pred["flippers_iou"] for pred in self.turle_mask_predictions.values()]
         head_ious = [pred["head_iou"] for pred in self.turle_mask_predictions.values()]
 
+        self._logger.info(f"Evaluting sample num: {len(turtle_ious)}, {len(flippers_ious)}, {len(head_ious)} (turtle, flippers, head)")
+        
         # Calculate mean IoU for each category
         res = {
             "turtle_miou": np.mean(turtle_ious) if turtle_ious else 0,
