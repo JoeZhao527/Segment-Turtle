@@ -12,7 +12,7 @@ For each training model, there are following files in the output directory:
 
 `model_best.pth`: The best checkpoint selected based on the validation performance. We used that to perform prediction and testing on test set
 
-`coco_instances_results.json` (mask2former, mask-rcnn): contains the prediction results for the test set, based on the best model checkpoint during training. The content is structured as following:
+`coco_instances_results.json` (mask2former, mask-rcnn): contains the prediction results for the test set, based on the best model checkpoint during training. See `instance_analysis.ipynb` for an demo of processing the file, evaluation and analysis. The json is structured as following:
 
 ```python
 {
