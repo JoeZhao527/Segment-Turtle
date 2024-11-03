@@ -28,7 +28,7 @@ from detectron2.data.datasets.turtle_dual_proposal_rcnn import split_n_prepare_t
 def register_dataset(cfg):
     base_dir = "./turtles-data/data"
 
-    datasets = split_n_prepare_turtle_coco(base_dir, dev_mode=True)
+    datasets = split_n_prepare_turtle_coco(base_dir, dev_mode=False)
 
     for _name, _data in datasets.items():
         register_turtle_coco(_data, _name, base_dir)
@@ -49,13 +49,13 @@ def prepare_model(cfg):
 
     cfg.SOLVER.IMS_PER_BATCH = 4  # This is the real "batch size" commonly known to deep learning people
     cfg.SOLVER.BASE_LR = 0.00025  # pick a good LR
-    cfg.SOLVER.MAX_ITER = 40   # 300 iterations seems good enough for this toy dataset; you will need to train longer for a practical dataset
+    cfg.SOLVER.MAX_ITER = 20000   # 300 iterations seems good enough for this toy dataset; you will need to train longer for a practical dataset
     cfg.SOLVER.STEPS = []        # do not decay learning rate
     cfg.MODEL.ROI_HEADS.BATCH_SIZE_PER_IMAGE = 16   # The "RoIHead batch size". 128 is faster, and good enough for this toy dataset (default: 512)
     cfg.MODEL.ROI_HEADS.NUM_CLASSES = 4  # only has one class (ballon). (see https://detectron2.readthedocs.io/tutorials/datasets.html#update-the-config-for-new-datasets)
     cfg.MODEL.DEVICE = 'cuda' if torch.cuda.is_available() else 'cpu'
     cfg.MODEL.SUB_INSTANCE_INTERSECTION_THRESHOLD = 0.7
-    cfg.TEST.EVAL_PERIOD = 20
+    cfg.TEST.EVAL_PERIOD = 1000
     cfg.INPUT.MASK_FORMAT = 'bitmask'
     cfg.OUTPUT_DIR = "./output_dual_prop_dual_head"
     
