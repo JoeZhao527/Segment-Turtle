@@ -54,6 +54,7 @@ def prepare_model(cfg):
     cfg.MODEL.ROI_HEADS.BATCH_SIZE_PER_IMAGE = 16   # The "RoIHead batch size". 128 is faster, and good enough for this toy dataset (default: 512)
     cfg.MODEL.ROI_HEADS.NUM_CLASSES = 3  # only has one class (ballon). (see https://detectron2.readthedocs.io/tutorials/datasets.html#update-the-config-for-new-datasets)
     cfg.MODEL.DEVICE = 'cuda' if torch.cuda.is_available() else 'cpu'
+    cfg.MODEL.SUB_INSTANCE_INTERSECTION_THRESHOLD = 0.7
     cfg.TEST.EVAL_PERIOD = 50
     cfg.INPUT.MASK_FORMAT = 'bitmask'
     cfg.OUTPUT_DIR = "./output_dual_prop_rcnn"
