@@ -113,6 +113,8 @@ def create_split_coco(img_ids, coco):
         COCO: Processed COCO object for the dataset split.
     """
     split_annotations = {}
+    max_id = max(coco.anns.keys())  # Start from the highest existing annotation ID
+
     for img_id in tqdm(img_ids, desc="Preprocessing bbox and masks"):
         anns = coco.imgToAnns[img_id]
 
@@ -120,10 +122,12 @@ def create_split_coco(img_ids, coco):
         turtle_anns = [copy.deepcopy(ann) for ann in anns if ann["category_id"] == 1]
         for ann in turtle_anns:
             ann["category_id"] = 4  # Set category ID to 4 for "whole_turtle"
+            max_id += 1  # Increment ID to ensure uniqueness
+            ann["id"] = max_id  # Assign the new unique ID
         
         # Process annotations for body parts dataset
         processed_anns = process_ann(anns, coco)
-        
+
         # Add the whole turtle annotations to the processed annotations
         processed_anns.extend(turtle_anns)
         
