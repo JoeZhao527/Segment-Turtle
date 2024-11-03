@@ -1,6 +1,5 @@
 _BASE_: "../Base-RCNN-C4.yaml"
 MODEL:
-  SUB_INSTANCE_INTERSECTION_THRESHOLD: 0.7
   META_ARCHITECTURE: "DualProposalRCNN"
   WEIGHTS: "detectron2://ImageNetPretrained/MSRA/R-50.pkl"
   MASK_ON: True
