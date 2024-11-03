@@ -1,6 +1,6 @@
 _BASE_: "../Base-RCNN-C4.yaml"
 MODEL:
-  META_ARCHITECTURE: "DualProposalRCNNSingleHead"
+  META_ARCHITECTURE: "DualProposalRCNNDualHead"
   WEIGHTS: "detectron2://ImageNetPretrained/MSRA/R-50.pkl"
   MASK_ON: True
   RESNETS:

@@ -166,5 +166,6 @@ cython_debug/
 turtles-data/
 output/
 output_maskformer_pretrained
+comparison/
 *.ipynb
 nohup.out
