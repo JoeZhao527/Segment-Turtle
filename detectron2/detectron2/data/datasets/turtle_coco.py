@@ -318,11 +318,6 @@ def split_n_prepare_turtle_coco(data_dir: str, dev_mode: bool = False):
         }
 
     Avaliable dataset names:
-        - Whole turtle:
-            turtle_whole_train
-            turtle_whole_valid
-            turtle_whole_test
-
         - Turtle body parts:
             turtle_parts_train
             turtle_parts_valid
@@ -356,63 +351,10 @@ def split_n_prepare_turtle_coco(data_dir: str, dev_mode: bool = False):
     ):
         logger.info(f"Preprocessing and registering for {split_name} data...")
 
-        # Process and register the whole turtle dataset
-        _data_name = f"turtle_whole_{split_name}"
-        split_coco_whole = create_split_coco(img_ids, coco, process_body_parts=False)
-        datasets[_data_name] = load_coco_api(split_coco_whole, data_dir, _data_name)
-
         # Process and register the turtle body parts dataset
         _data_name = f"turtle_parts_{split_name}"
         split_coco_parts = create_split_coco(img_ids, coco, process_body_parts=True)
         datasets[_data_name] = load_coco_api(split_coco_parts, data_dir, _data_name)
-
-    return datasets
-
-
-def split_n_prepare_turtle_semantic_coco(data_dir: str, dev_mode: bool = False):
-    """
-    Process and prepare the turtle dataset under data_dir.
-
-    This is an extended copy of split_n_prepare_turtle_coco, which add a semantic segmentation
-    mask to each dict in the dataset, for semantic segmentations
-    """
-    # Initialize paths
-    annotations_path = os.path.join(data_dir, 'annotations.json')
-    split_path = os.path.join(data_dir, 'metadata_splits.csv')
-
-    # Load the split dataframe
-    split = pd.read_csv(split_path)
-
-    # Load the COCO annotations
-    coco = COCO(annotations_path)
-
-    # Separate the COCO ids into train/valid/test based on the split DataFrame
-    train_ids = split[split['split_open'] == 'train']['id'].tolist()
-    valid_ids = split[split['split_open'] == 'valid']['id'].tolist()
-    test_ids = split[split['split_open'] == 'test']['id'].tolist()
-
-    # Only process a small portion of data for development
-    if dev_mode:
-        train_ids = train_ids[:80]
-        valid_ids = valid_ids[:40]
-        test_ids = test_ids[:20]
-
-    datasets = {}
-    # Register each dataset split
-    for split_name, img_ids in zip(
-        ["train", "valid", "test"], [train_ids, valid_ids, test_ids]
-    ):
-        logger.info(f"Preprocessing and registering for {split_name} data...")
-
-        # Process and register the whole turtle dataset
-        _data_name = f"turtle_whole_{split_name}"
-        split_coco_whole = create_split_coco(img_ids, coco, process_body_parts=False)
-        datasets[_data_name] = load_coco_api_semantic(split_coco_whole, data_dir, _data_name)
-
-        # Process and register the turtle body parts dataset
-        _data_name = f"turtle_parts_{split_name}"
-        split_coco_parts = create_split_coco(img_ids, coco, process_body_parts=True)
-        datasets[_data_name] = load_coco_api_semantic(split_coco_parts, data_dir, _data_name)
 
     return datasets
 
