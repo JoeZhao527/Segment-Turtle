@@ -77,7 +77,6 @@ class TurtleCOCOEvaluator(COCOEvaluator):
 
     def evaluate(self):
         id_map = {v: k for k, v in self.dataset_id_to_contiguous_id.items()}
-        print(id_map)
         cat_ids = [id_map[i] for i in range(self.num_classes)]
 
         eval_result = compute_iou(

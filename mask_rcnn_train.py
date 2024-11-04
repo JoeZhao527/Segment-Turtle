@@ -29,10 +29,11 @@ from detectron2.data import build_detection_test_loader
 from detectron2.data.datasets import register_coco_instances
 from detectron2.data.datasets.turtle_coco import split_n_prepare_turtle_coco, register_turtle_coco
 
-def register_dataset(cfg):
-    base_dir = "./turtles-data/data"
+import argparse  # Add this import at the top
 
-    datasets = split_n_prepare_turtle_coco(base_dir, dev_mode=True)
+def register_dataset(cfg, dev_mode):
+    base_dir = "./turtles-data/data"
+    datasets = split_n_prepare_turtle_coco(base_dir, dev_mode=dev_mode)
 
     for _name, _data in datasets.items():
         register_turtle_coco(_data, _name, base_dir)
@@ -41,7 +42,7 @@ def register_dataset(cfg):
     cfg.DATASETS.TEST = ("turtle_parts_valid",)
 
 
-def prepare_model(cfg):
+def prepare_model(cfg, dev_mode, output_dir):
     cfg.merge_from_file(model_zoo.get_config_file("COCO-InstanceSegmentation/mask_rcnn_R_50_C4_3x.yaml"))
 
     # Switch the valid and test split, as the detectron2 uses cfg.DATASETS.TEST for validation
@@ -53,19 +54,30 @@ def prepare_model(cfg):
 
     cfg.SOLVER.IMS_PER_BATCH = 4  # This is the real "batch size" commonly known to deep learning people
     cfg.SOLVER.BASE_LR = 0.00025  # pick a good LR
-    cfg.SOLVER.MAX_ITER = 40   # 300 iterations seems good enough for this toy dataset; you will need to train longer for a practical dataset
+    if dev_mode:
+        cfg.SOLVER.MAX_ITER = 40
+        cfg.TEST.EVAL_PERIOD = 20
+    else:
+        cfg.SOLVER.MAX_ITER = 20000
+        cfg.TEST.EVAL_PERIOD = 1000
+        
     cfg.SOLVER.STEPS = []        # do not decay learning rate
     cfg.MODEL.ROI_HEADS.BATCH_SIZE_PER_IMAGE = 16   # The "RoIHead batch size". 128 is faster, and good enough for this toy dataset (default: 512)
     cfg.MODEL.ROI_HEADS.NUM_CLASSES = 3  # only has one class (ballon). (see https://detectron2.readthedocs.io/tutorials/datasets.html#update-the-config-for-new-datasets)
     cfg.MODEL.DEVICE = 'cuda' if torch.cuda.is_available() else 'cpu'
-    cfg.TEST.EVAL_PERIOD = 20
     cfg.INPUT.MASK_FORMAT = 'bitmask'
-    cfg.OUTPUT_DIR = "./output_mask_rcnn"
+    cfg.OUTPUT_DIR = output_dir
     
 def setup():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--dev', action='store_true', help='Enable development mode')
+    parser.add_argument('--output_dir', type=str, default='./output_mask_rcnn',
+                       help='Directory for output files')
+    args = parser.parse_args()
+
     cfg = get_cfg()
-    register_dataset(cfg)
-    prepare_model(cfg)
+    register_dataset(cfg, args.dev)
+    prepare_model(cfg, args.dev, args.output_dir)
     os.makedirs(cfg.OUTPUT_DIR, exist_ok=True)
 
     return cfg
