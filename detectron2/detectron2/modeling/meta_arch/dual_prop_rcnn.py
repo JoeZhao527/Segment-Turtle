@@ -87,7 +87,9 @@ class DualProposalRCNNSingleHead(GeneralizedRCNN):
             r = detector_postprocess(results_per_image, height, width)
 
             # Separate instances by category: super-category (4) and sub-categories (1, 2, 3)
-            super_category_mask = (r.pred_classes == 4)
+            # Notice that the data preprocessing applied a mapping to the categories (all categories -1),
+            # Thus the super-category is now category 3
+            super_category_mask = (r.pred_classes == 3)
             sub_category_mask = ~super_category_mask
 
             super_instances = r[super_category_mask]
@@ -222,13 +224,15 @@ class DualProposalRCNNDualHead(GeneralizedRCNN):
         images = self.preprocess_image(batched_inputs)
 
         # Split GT instances into whole turtle (category 4) and body parts (categories 1, 2, 3)
+        # Notice that the data preprocessing applied a mapping to the categories (all categories -1),
+        # Thus the super-category is now category 3
         if "instances" in batched_inputs[0]:
             gt_instances = [x["instances"].to(self.device) for x in batched_inputs]
             whole_turtle_instances = []
             body_parts_instances = []
 
             for instance in gt_instances:
-                whole_turtle_mask = instance.gt_classes == 4
+                whole_turtle_mask = instance.gt_classes == 3
                 body_parts_mask = ~whole_turtle_mask
 
                 # Separate instances for each group
@@ -252,7 +256,7 @@ class DualProposalRCNNDualHead(GeneralizedRCNN):
         _, whole_detector_losses = self.roi_heads(
             images, features, whole_proposals, whole_turtle_instances
         )
-
+        
         # Use secondary proposal generator and ROI heads for the body parts instances
         if self.sub_proposal_generator is not None:
             sub_proposals, sub_proposal_losses = self.sub_proposal_generator(
@@ -305,7 +309,9 @@ class DualProposalRCNNDualHead(GeneralizedRCNN):
             r = detector_postprocess(results_per_image, height, width)
 
             # Separate instances by category: super-category (4) and sub-categories (1, 2, 3)
-            super_category_mask = (r.pred_classes == 4)
+            # Notice that the data preprocessing applied a mapping to the categories (all categories -1),
+            # Thus the super-category is now category 3
+            super_category_mask = (r.pred_classes == 3)
             sub_category_mask = ~super_category_mask
 
             super_instances = r[super_category_mask]

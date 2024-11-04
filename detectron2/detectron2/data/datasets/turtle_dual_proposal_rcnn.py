@@ -87,7 +87,7 @@ def split_n_prepare_turtle_coco(data_dir: str, dev_mode: bool = False):
         split_coco_parts = create_split_coco(img_ids, coco)
         
         datasets[_data_name] = load_coco_api(split_coco_parts, data_dir, _data_name)
-
+        
     return datasets
 
 

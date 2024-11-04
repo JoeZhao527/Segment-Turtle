@@ -32,6 +32,10 @@ class TurtleCOCOEvaluator(COCOEvaluator):
         self.ground_truth_mask = init_ground_truth(self._coco_api)
         self.turle_mask_predictions = {}
 
+        self.dataset_id_to_contiguous_id = self._metadata.thing_dataset_id_to_contiguous_id
+        self.all_contiguous_ids = list(self.dataset_id_to_contiguous_id.values())
+        self.num_classes = len(self.all_contiguous_ids)
+
     def process(self, inputs, outputs):
         for input, output in zip(inputs, outputs):
             # Extract instances from the output
@@ -48,12 +52,10 @@ class TurtleCOCOEvaluator(COCOEvaluator):
             class_masks = {}
 
             # unmap the category ids for COCO
-            dataset_id_to_contiguous_id = self._metadata.thing_dataset_id_to_contiguous_id
-            all_contiguous_ids = list(dataset_id_to_contiguous_id.values())
-            num_classes = len(all_contiguous_ids)
-            assert min(all_contiguous_ids) == 0 and max(all_contiguous_ids) == num_classes - 1
+            
+            assert min(self.all_contiguous_ids) == 0 and max(self.all_contiguous_ids) == self.num_classes - 1
 
-            reverse_id_mapping = {v: k for k, v in dataset_id_to_contiguous_id.items()}
+            reverse_id_mapping = {v: k for k, v in self.dataset_id_to_contiguous_id.items()}
 
             # Perform logical OR for each class using tensor operations
             for class_id in unique_classes:
@@ -74,9 +76,12 @@ class TurtleCOCOEvaluator(COCOEvaluator):
         return self.turle_mask_predictions
 
     def evaluate(self):
+        cat_ids = [self.dataset_id_to_contiguous_id[i] for i in range(self.num_classes)]
+
         eval_result = compute_iou(
             gt=self.ground_truth_mask,
-            pred=self.turle_mask_predictions
+            pred=self.turle_mask_predictions,
+            cat_ids=cat_ids
         )
         
         if self._output_dir:
@@ -95,6 +100,9 @@ class TurtleCOCOEvaluator(COCOEvaluator):
             "head_miou": head_miou,
             "average_miou": (turtle_miou + flippers_miou + head_miou) / 3
         }
+
+        if 4 in cat_ids:
+            result["whole_turtle_miou"] = np.array(list(eval_result[4].values())).mean()
 
         return result
 
@@ -115,9 +123,9 @@ def get_mask(preds: dict, img_id, cat_id):
 
     return mask
 
-def compute_iou(gt, pred):
+def compute_iou(gt, pred, cat_ids=[1, 2, 3]):
     results = {}
-    for cat_id in [1, 2, 3]:
+    for cat_id in cat_ids:
         results[cat_id] = {}
 
         for img_id, cats in tqdm(gt.items(), desc=f"Processing cat {cat_id}"):
