@@ -1,0 +1,76 @@
+1. 
+- Image with no annotations: 7772,  8436
+- Possiblly wrong annotations(Has no turtle annotations but has parts 
+annotations): 1958, 4566, 6730, 6732, 6733, 6735, 7187
+
+2. Following images have multiple turtle registered(regarding the point 
+1, some turtle annotations may missed)
+Image: images/t073/iLEGMMQBau.jpeg
+Number of turtles: 2
+Turtle details:
+--------------------------------------------------
+
+Image: images/t073/vMVqYkrwfS.jpeg
+Number of turtles: 2
+Turtle details:
+--------------------------------------------------
+
+Image: images/t093/KxsYYHIhdb.jpeg
+Number of turtles: 2
+Turtle details:
+--------------------------------------------------
+
+Image: images/t093/WfQSEELHGT.jpeg
+Number of turtles: 2
+Turtle details:
+--------------------------------------------------
+
+Image: images/t157/TKnYLgjpZN.jpeg
+Number of turtles: 3
+Turtle details:
+--------------------------------------------------
+
+Image: images/t243/lmpyQDNGLJ.jpeg
+Number of turtles: 2
+Turtle details:
+--------------------------------------------------
+
+Image: images/t276/RutuWKxUhB.JPG
+Number of turtles: 2
+Turtle details:
+--------------------------------------------------
+
+Image: images/t003/DsLKhAEQHe.jpeg
+Number of turtles: 3
+Turtle details:
+--------------------------------------------------
+
+Image: images/t373/eHopYmLDXl.jpeg
+Number of turtles: 2
+Turtle details:
+--------------------------------------------------
+
+Image: images/t398/ByfSjvYayg.jpeg
+Number of turtles: 2
+Turtle details:
+--------------------------------------------------
+
+Image: images/t398/xttwXXCwMQ.jpeg
+Number of turtles: 2
+Turtle details:
+--------------------------------------------------
+
+Image: images/t567/cNauUmizjB.jpeg
+Number of turtles: 3
+Turtle details:
+--------------------------------------------------
+
+Image: images/t567/eLSLkssLJd.jpeg
+Number of turtles: 3
+Turtle details:
+--------------------------------------------------
+
+Image: images/t567/hMrwEDnFrp.jpeg
+Number of turtles: 3
+Turtle details:
+--------------------------------------------------
