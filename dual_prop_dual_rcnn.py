@@ -57,7 +57,7 @@ def prepare_model(cfg, dev_mode, output_dir):
     else:
         cfg.SOLVER.MAX_ITER = 20000
         cfg.TEST.EVAL_PERIOD = 1000
-        
+
     cfg.SOLVER.STEPS = []        # do not decay learning rate
     cfg.MODEL.ROI_HEADS.BATCH_SIZE_PER_IMAGE = 16   # The "RoIHead batch size". 128 is faster, and good enough for this toy dataset (default: 512)
     cfg.MODEL.ROI_HEADS.NUM_CLASSES = 4  # only has one class (ballon). (see https://detectron2.readthedocs.io/tutorials/datasets.html#update-the-config-for-new-datasets)
@@ -72,6 +72,8 @@ def setup():
     parser.add_argument('--output_dir', type=str, default='./output_dual_prop_dual_head',
                        help='Directory for output files')
     args = parser.parse_args()
+
+    assert not os.path.exists(args.output_dir), f"Output directory {args.output_dir} already exists"
 
     cfg = get_cfg()
     register_dataset(cfg, args.dev)

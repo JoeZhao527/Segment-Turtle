@@ -75,6 +75,8 @@ def setup():
                        help='Directory for output files')
     args = parser.parse_args()
 
+    assert not os.path.exists(args.output_dir), f"Output directory {args.output_dir} already exists"
+    
     cfg = get_cfg()
     register_dataset(cfg, args.dev)
     prepare_model(cfg, args.dev, args.output_dir)

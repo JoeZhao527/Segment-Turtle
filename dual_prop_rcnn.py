@@ -71,6 +71,8 @@ def setup():
     parser.add_argument('--output_dir', type=str, default='./output_dual_prop_rcnn',
                        help='Directory for output files')
     args = parser.parse_args()
+    
+    assert not os.path.exists(args.output_dir), f"Output directory {args.output_dir} already exists"
 
     cfg = get_cfg()
     register_dataset(cfg, args.dev)
