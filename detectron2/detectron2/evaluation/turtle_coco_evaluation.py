@@ -76,7 +76,9 @@ class TurtleCOCOEvaluator(COCOEvaluator):
         return self.turle_mask_predictions
 
     def evaluate(self):
-        cat_ids = [self.dataset_id_to_contiguous_id[i] for i in range(self.num_classes)]
+        id_map = {v: k for k, v in self.dataset_id_to_contiguous_id.items()}
+        print(id_map)
+        cat_ids = [id_map[i] for i in range(self.num_classes)]
 
         eval_result = compute_iou(
             gt=self.ground_truth_mask,
