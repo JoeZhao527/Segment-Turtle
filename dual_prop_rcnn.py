@@ -75,7 +75,7 @@ def setup():
     cfg = get_cfg()
     register_dataset(cfg, args.dev)
     prepare_model(cfg, args.dev, args.output_dir)
-    os.makedirs(cfg.OUTPUT_DIR, exist_ok=True)
+    os.makedirs(cfg.OUTPUT_DIR, exist_ok=False)
 
     return cfg
 
