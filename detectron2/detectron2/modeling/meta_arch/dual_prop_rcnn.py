@@ -87,9 +87,7 @@ class DualProposalRCNNSingleHead(GeneralizedRCNN):
             width = input_per_image.get("width", image_size[1])
             r = detector_postprocess(results_per_image, height, width)
 
-            # Separate instances by category: super-category (4) and sub-categories (1, 2, 3)
-            # Notice that the data preprocessing applied a mapping to the categories (all categories -1),
-            # Thus the super-category is now category 3
+            # Separate instances by category: super-category (3) and sub-categories (0, 1, 2)
             super_category_mask = (r.pred_classes == 3)
             sub_category_mask = ~super_category_mask
 
@@ -97,28 +95,20 @@ class DualProposalRCNNSingleHead(GeneralizedRCNN):
             sub_instances = r[sub_category_mask]
 
             # If there are no super-category instances, skip filtering
-            if len(super_instances) > 0:
-                # Create a mask to filter out sub-instances based on intersection ratio
-                valid_sub_instance_mask = torch.zeros(len(sub_instances), dtype=torch.bool, device=r.pred_boxes.device)
+            if len(super_instances) > 0 and len(sub_instances) > 0:
+                # Ensure pred_boxes are in the Boxes format
+                super_boxes = Boxes(super_instances.pred_boxes.tensor)
+                sub_boxes = Boxes(sub_instances.pred_boxes.tensor)
 
-                # Check each sub-instance bounding box for intersection with any super-instance bounding box
-                for i, sub_box in enumerate(sub_instances.pred_boxes):
-                    sub_box_area = sub_box.area().item()
-                    keep_sub_instance = False
+                # Calculate pairwise intersections between all sub and super boxes
+                intersection_matrix = pairwise_intersection(sub_boxes, super_boxes)
+                sub_areas = sub_boxes.area()  # [N] tensor of sub-instance areas
 
-                    for super_box in super_instances.pred_boxes:
-                        intersection_area = sub_box.intersection(super_box).area().item()
-
-                        # Calculate intersection ratio
-                        intersection_ratio = intersection_area / sub_box_area if sub_box_area > 0 else 1.0
-                        
-                        # Keep the sub-instance if intersection ratio exceeds the threshold
-                        if intersection_ratio > threshold:
-                            keep_sub_instance = True
-                            break  # No need to check other super boxes once condition is met
-
-                    # Update the mask based on whether the sub-instance meets the criterion
-                    valid_sub_instance_mask[i] = keep_sub_instance
+                # Calculate intersection ratios for each sub-instance with each super-instance
+                intersection_ratios = intersection_matrix / sub_areas[:, None]  # [N, M] matrix
+                
+                # Determine which sub-instances have a sufficient intersection with any super-instance
+                valid_sub_instance_mask = (intersection_ratios > threshold).any(dim=1)
 
                 # Filter the sub-instances that meet the intersection ratio criterion
                 filtered_sub_instances = sub_instances[valid_sub_instance_mask]
@@ -328,8 +318,7 @@ class DualProposalRCNNDualHead(GeneralizedRCNN):
 
                 # Calculate intersection ratios for each sub-instance with each super-instance
                 intersection_ratios = intersection_matrix / sub_areas[:, None]  # [N, M] matrix
-                print(sub_areas, intersection_matrix, intersection_ratios)
-                exit(0)
+
                 # Determine which sub-instances have a sufficient intersection with any super-instance
                 valid_sub_instance_mask = (intersection_ratios > threshold).any(dim=1)
 
