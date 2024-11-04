@@ -274,10 +274,19 @@ class DualProposalRCNNDualHead(GeneralizedRCNN):
 
         # Aggregate losses from both groups
         losses = {}
-        losses.update(whole_detector_losses)
-        losses.update(whole_proposal_losses)
-        losses.update(sub_detector_losses)
-        losses.update(sub_proposal_losses)
+
+        for _key, _loss in whole_detector_losses.items():
+            losses[f"whole_{_key}"] = _loss
+
+        for _key, _loss in whole_proposal_losses.items():
+            losses[f"whole_{_key}"] = _loss
+
+        for _key, _loss in sub_detector_losses.items():
+            losses[f"parts_{_key}"] = _loss
+
+        for _key, _loss in sub_proposal_losses.items():
+            losses[f"parts_{_key}"] = _loss
+            
         return losses
     
     @staticmethod
