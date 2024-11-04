@@ -7,7 +7,7 @@ from torch import nn
 from detectron2.config import configurable
 from detectron2.data.detection_utils import convert_image_to_rgb
 from detectron2.layers import move_device_like
-from detectron2.structures import ImageList, Instances
+from detectron2.structures import ImageList, Instances, Boxes
 from detectron2.utils.events import get_event_storage
 from detectron2.utils.logger import log_first_n
 
@@ -290,7 +290,7 @@ class DualProposalRCNNDualHead(GeneralizedRCNN):
 
         for _key, _loss in sub_proposal_losses.items():
             losses[f"parts_{_key}"] = _loss
-            
+
         return losses
     
     @staticmethod
@@ -309,8 +309,6 @@ class DualProposalRCNNDualHead(GeneralizedRCNN):
             r = detector_postprocess(results_per_image, height, width)
 
             # Separate instances by category: super-category (4) and sub-categories (1, 2, 3)
-            # Notice that the data preprocessing applied a mapping to the categories (all categories -1),
-            # Thus the super-category is now category 3
             super_category_mask = (r.pred_classes == 3)
             sub_category_mask = ~super_category_mask
 
@@ -319,20 +317,24 @@ class DualProposalRCNNDualHead(GeneralizedRCNN):
 
             # If there are no super-category instances, skip filtering
             if len(super_instances) > 0:
+                # Ensure pred_boxes are in the Boxes format to use .area() and .intersection() methods
+                super_boxes = Boxes(super_instances.pred_boxes.tensor)
+                sub_boxes = Boxes(sub_instances.pred_boxes.tensor)
+
                 # Create a mask to filter out sub-instances based on intersection ratio
                 valid_sub_instance_mask = torch.zeros(len(sub_instances), dtype=torch.bool, device=r.pred_boxes.device)
 
                 # Check each sub-instance bounding box for intersection with any super-instance bounding box
-                for i, sub_box in enumerate(sub_instances.pred_boxes):
+                for i, sub_box in enumerate(sub_boxes):
                     sub_box_area = sub_box.area().item()
                     keep_sub_instance = False
 
-                    for super_box in super_instances.pred_boxes:
+                    for super_box in super_boxes:
                         intersection_area = sub_box.intersection(super_box).area().item()
-
+                        
                         # Calculate intersection ratio
                         intersection_ratio = intersection_area / sub_box_area if sub_box_area > 0 else 1.0
-                        
+                        print(intersection_area, sub_box_area, intersection_ratio)
                         # Keep the sub-instance if intersection ratio exceeds the threshold
                         if intersection_ratio > threshold:
                             keep_sub_instance = True
