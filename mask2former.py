@@ -32,10 +32,8 @@ from detectron2.evaluation import COCOEvaluator, inference_on_dataset
 from detectron2.evaluation.turtle_coco_evaluation import TurtleCOCOEvaluator
 from detectron2.data import build_detection_test_loader
 
-def register_dataset(cfg):
-    base_dir = "./turtles-data/data"
-
-    datasets = split_n_prepare_turtle_coco(base_dir, dev_mode=False)
+def register_dataset(cfg, dev_mode, base_dir):
+    datasets = split_n_prepare_turtle_coco(base_dir, dev_mode=dev_mode)
 
     for _name, _data in datasets.items():
         register_turtle_coco(_data, _name, base_dir)
@@ -43,7 +41,7 @@ def register_dataset(cfg):
     cfg.DATASETS.TRAIN = ("turtle_parts_train",)
     cfg.DATASETS.TEST = ("turtle_parts_valid",)
 
-def prepare_model(cfg):
+def prepare_model(cfg, dev_mode, output_dir):
     cfg.merge_from_file("./detectron2/configs/COCO-Mask2former/instance-segmentation/swin/maskformer2_swin_tiny_bs16_50ep.yaml")
     cfg.MODEL.WEIGHTS = "https://dl.fbaipublicfiles.com/maskformer/mask2former/coco/instance/maskformer2_swin_tiny_bs16_50ep/model_final_86143f.pkl"
     cfg.DATALOADER.NUM_WORKERS = 0
@@ -53,32 +51,41 @@ def prepare_model(cfg):
     cfg.MODEL.ROI_BOX_HEAD.FED_LOSS_NUM_CLASSES = 3
     cfg.MODEL.SEM_SEG_HEAD.NUM_CLASSES = 3
     cfg.MODEL.RETINANET.NUM_CLASSES = 3
-    cfg.OUTPUT_DIR = "./output_mask2former"
+    cfg.OUTPUT_DIR = output_dir
     cfg.SOLVER.BASE_LR = 0.00025  # pick a good LR
-    cfg.SOLVER.MAX_ITER = 20000
-    cfg.TEST.EVAL_PERIOD = 1000
+    if dev_mode:
+        cfg.SOLVER.MAX_ITER = 40
+        cfg.TEST.EVAL_PERIOD = 20
+    else:
+        cfg.SOLVER.MAX_ITER = 20000
+        cfg.TEST.EVAL_PERIOD = 1000
 
 def setup(args):
     """
     Create configs and perform basic setups.
     """
     cfg = get_cfg()
-    # for poly lr schedule
     add_deeplab_config(cfg)
     add_maskformer2_config(cfg)
     
-    prepare_model(cfg)
-    register_dataset(cfg)
+    prepare_model(cfg, args.dev, args.output_dir)
+    register_dataset(cfg, args.dev, args.data_dir)
     default_setup(cfg, args)
-    # Setup logger for "mask_former" module
     setup_logger(output=cfg.OUTPUT_DIR, distributed_rank=comm.get_rank(), name="mask2former")
     
     return cfg
 
-
 if __name__ == '__main__':
-    args = default_argument_parser().parse_args()
-    print("Command Line Args:", args)
+    parser = default_argument_parser()
+    parser.add_argument('--dev', action='store_true', help='Enable development mode')
+    parser.add_argument('--output_dir', type=str, default='./output_mask2former',
+                       help='Directory for output files')
+    parser.add_argument('--data_dir', type=str, default='./turtles-data/data',
+                       help='Directory containing the dataset')
+    args = parser.parse_args()
+    
+    assert not os.path.exists(args.output_dir), f"Output directory {args.output_dir} already exists"
+    assert os.path.exists(args.data_dir), f"Data directory {args.data_dir} does not exist"
 
     cfg = setup(args)
 

@@ -31,10 +31,10 @@ from detectron2.data import build_detection_test_loader
 from detectron2.data.datasets import register_coco_instances
 from detectron2.data.datasets.turtle_coco_semantic import register_turtle_coco, split_n_prepare_turtle_semantic_coco
 
-def register_dataset(cfg):
-    base_dir = "./turtles-data/data"
+import argparse
 
-    datasets = split_n_prepare_turtle_semantic_coco(base_dir, dev_mode=False)
+def register_dataset(cfg, dev_mode, base_dir):
+    datasets = split_n_prepare_turtle_semantic_coco(base_dir, dev_mode=dev_mode)
 
     for _name, _data in datasets.items():
         register_turtle_coco(_data, _name, base_dir)
@@ -43,7 +43,7 @@ def register_dataset(cfg):
     cfg.DATASETS.TEST = ("turtle_parts_valid",)
 
 
-def prepare_model(cfg):
+def prepare_model(cfg, dev_mode, output_dir):
     cfg.merge_from_file(model_zoo.get_config_file("Turtle-Semantic/unet-semantic.yaml"))
 
     cfg.MODEL.BACKBONE.ENCODER_NAME = "resnet34"
@@ -60,18 +60,34 @@ def prepare_model(cfg):
 
     cfg.SOLVER.IMS_PER_BATCH = 2  # This is the real "batch size" commonly known to deep learning people
     cfg.SOLVER.BASE_LR = 0.00025  # pick a good LR
-    cfg.SOLVER.MAX_ITER = 20000   # 300 iterations seems good enough for this toy dataset; you will need to train longer for a practical dataset
+    if dev_mode:
+        cfg.SOLVER.MAX_ITER = 40
+        cfg.TEST.EVAL_PERIOD = 20
+    else:
+        cfg.SOLVER.MAX_ITER = 20000
+        cfg.TEST.EVAL_PERIOD = 1000
     cfg.SOLVER.STEPS = []        # do not decay learning rate
     
     cfg.MODEL.DEVICE = 'cuda' if torch.cuda.is_available() else 'cpu'
     cfg.TEST.EVAL_PERIOD = 1000
-    cfg.OUTPUT_DIR = "./output_unet"
+    cfg.OUTPUT_DIR = output_dir
     
 def setup():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--dev', action='store_true', help='Enable development mode')
+    parser.add_argument('--output_dir', type=str, default='./output_unet',
+                       help='Directory for output files')
+    parser.add_argument('--data_dir', type=str, default='./turtles-data/data',
+                       help='Directory containing the dataset')
+    args = parser.parse_args()
+
+    assert not os.path.exists(args.output_dir), f"Output directory {args.output_dir} already exists"
+    assert os.path.exists(args.data_dir), f"Data directory {args.data_dir} does not exist"
+
     cfg = get_cfg()
-    register_dataset(cfg)
-    prepare_model(cfg)
-    os.makedirs(cfg.OUTPUT_DIR, exist_ok=True)
+    register_dataset(cfg, args.dev, args.data_dir)
+    prepare_model(cfg, args.dev, args.output_dir)
+    os.makedirs(cfg.OUTPUT_DIR, exist_ok=False)
 
     return cfg
 
