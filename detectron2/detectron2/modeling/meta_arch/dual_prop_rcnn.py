@@ -109,12 +109,12 @@ class DualProposalRCNNSingleHead(GeneralizedRCNN):
                 
                 # Determine which sub-instances have a sufficient intersection with any super-instance
                 valid_sub_instance_mask = (intersection_ratios > threshold).any(dim=1)
-                if not valid_sub_instance_mask.any():
-                    print(intersection_matrix)
-                    print(sub_areas)
-                    print(intersection_ratios)
-                    print(valid_sub_instance_mask)
-                    exit(0)
+                print(intersection_matrix)
+                print(sub_areas)
+                print(intersection_ratios)
+                print(valid_sub_instance_mask)
+                print(" === ")
+                print()
                 # Filter the sub-instances that meet the intersection ratio criterion
                 filtered_sub_instances = sub_instances[valid_sub_instance_mask]
 
