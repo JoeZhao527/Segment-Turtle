@@ -49,7 +49,7 @@ class TurtleSemSegEvaluator(SemSegEvaluator):
             # Convert pred and gt to RLE format
             pred_rle = encode_multi_class_mask(pred)
             gt_rle = encode_multi_class_mask(gt)
-            
+
             self.turle_mask_predictions = {
                 **self.turle_mask_predictions,
                 input["image_id"]: {
@@ -62,6 +62,8 @@ class TurtleSemSegEvaluator(SemSegEvaluator):
             }
 
     def evaluate(self):
+        print(self.turle_mask_predictions)
+        exit(0)
         if self._output_dir:
             PathManager.mkdirs(self._output_dir)
             file_path = os.path.join(self._output_dir, "sem_seg_predictions.json")
@@ -107,13 +109,13 @@ def encode_multi_class_mask(mask):
     rle_dict = {}
     unique_classes = np.unique(mask)
 
-    for cls in unique_classes:
-        binary_mask = (mask == cls).astype(np.uint8)
+    for _cls in unique_classes:
+        binary_mask = (mask == _cls).astype(np.uint8)
         rle = mask_util.encode(np.asfortranarray(binary_mask))
 
         rle["counts"] = rle["counts"].decode("utf-8")
 
-        rle_dict[cls] = rle
+        rle_dict[_cls] = rle
 
     return rle_dict
 
