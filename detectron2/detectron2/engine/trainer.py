@@ -69,7 +69,7 @@ class TurtleSemanticTrainer(DefaultTrainer):
 
     @classmethod
     def build_test_loader(cls, cfg, dataset_name):
-        mapper = TurtleSemanticDatasetMapper(cfg, is_train=True)
+        mapper = TurtleSemanticDatasetMapper(cfg, is_train=False)
         return build_detection_test_loader(cfg, dataset_name, mapper=mapper)
     
     @classmethod

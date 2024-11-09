@@ -119,7 +119,7 @@ def load_coco_api_semantic(coco_api, image_root, dataset_name=None, extra_annota
     return dataset_dicts
 
 
-def split_n_prepare_turtle_semantic_coco(data_dir: str, dev_mode: bool = False):
+def split_n_prepare_turtle_semantic_coco(data_dir: str, dev_mode: bool = False, test_only: bool = False):
     """
     Process and prepare the turtle dataset under data_dir.
 
@@ -175,6 +175,10 @@ def split_n_prepare_turtle_semantic_coco(data_dir: str, dev_mode: bool = False):
     for split_name, img_ids in zip(
         ["train", "valid", "test"], [train_ids, valid_ids, test_ids]
     ):
+        if test_only:
+            if split_name != "test":
+                continue
+
         logger.info(f"Preprocessing and registering for {split_name} data...")
 
         # Process and register the whole turtle dataset

@@ -47,13 +47,9 @@ class TurtleSemSegEvaluator(SemSegEvaluator):
             gt = input["sem_seg_gt"]
 
             # Convert pred and gt to RLE format
-            pred_rle = mask_util.encode(np.asfortranarray(pred.astype(np.uint8)))
-            gt_rle = mask_util.encode(np.asfortranarray(gt.astype(np.uint8)))
-
-            # Convert RLE counts from bytes to a UTF-8 string for JSON serialization
-            pred_rle["counts"] = pred_rle["counts"].decode("utf-8")
-            gt_rle["counts"] = gt_rle["counts"].decode("utf-8")
-
+            pred_rle = encode_multi_class_mask(pred)
+            gt_rle = encode_multi_class_mask(gt)
+            
             self.turle_mask_predictions = {
                 **self.turle_mask_predictions,
                 input["image_id"]: {
@@ -97,7 +93,29 @@ class TurtleSemSegEvaluator(SemSegEvaluator):
         self._logger.info(res)
         return res
 
-    
+
+def encode_multi_class_mask(mask):
+    """
+    Encode a multi-class mask into RLE format for each class.
+
+    Args:
+        mask (np.ndarray): The input mask of shape (H, W) with integer class labels.
+
+    Returns:
+        dict: A dictionary where keys are class labels and values are RLE-encoded masks.
+    """
+    rle_dict = {}
+    unique_classes = np.unique(mask)
+
+    for cls in unique_classes:
+        binary_mask = (mask == cls).astype(np.uint8)
+        rle = mask_util.encode(np.asfortranarray(binary_mask))
+
+        rle["counts"] = rle["counts"].decode("utf-8")
+
+        rle_dict[cls] = rle
+
+    return rle_dict
 
 # Helper function to compute IoU for a specific class
 def compute_iou(pred, target, class_id):

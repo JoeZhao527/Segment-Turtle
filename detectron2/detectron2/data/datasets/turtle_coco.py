@@ -211,94 +211,7 @@ Category ids in annotations are not in [1, #categories]! We'll apply a mapping f
         )
     return dataset_dicts
 
-
-def load_coco_api_semantic(coco_api, image_root, dataset_name=None, extra_annotation_keys=None):
-    # sort indices for reproducible results
-    img_ids = sorted(coco_api.imgs.keys())
-    imgs = coco_api.loadImgs(img_ids)
-
-    anns = [coco_api.imgToAnns[img_id] for img_id in img_ids]
-    total_num_valid_anns = sum([len(x) for x in anns])
-    total_num_anns = len(coco_api.anns)
-    if total_num_valid_anns < total_num_anns:
-        logger.warning(
-            f"contains {total_num_anns} annotations, but only "
-            f"{total_num_valid_anns} of them match to images in the file."
-        )
-
-    imgs_anns = list(zip(imgs, anns))
-    logger.info("Loaded {} images in COCO format from {}".format(len(imgs_anns), "input coco"))
-
-    dataset_dicts = []
-
-    ann_keys = ["iscrowd", "bbox", "keypoints", "category_id"] + (extra_annotation_keys or [])
-
-    num_instances_without_valid_segmentation = 0
-
-    for img_dict, anno_dict_list in imgs_anns:
-        record = {}
-        record["file_name"] = os.path.join(image_root, img_dict["file_name"])
-        record["height"] = img_dict["height"]
-        record["width"] = img_dict["width"]
-        image_id = record["image_id"] = img_dict["id"]
-
-        objs = []
-        for anno in anno_dict_list:
-            assert anno["image_id"] == image_id
-
-            assert anno.get("ignore", 0) == 0, '"ignore" in COCO json file is not supported.'
-
-            obj = {key: anno[key] for key in ann_keys if key in anno}
-            if "bbox" in obj and len(obj["bbox"]) == 0:
-                raise ValueError(
-                    f"One annotation of image {image_id} contains empty 'bbox' value! "
-                    "This json does not have valid COCO format."
-                )
-
-            segm = anno.get("segmentation", None)
-            if segm:  # either list[list[float]] or dict(RLE)
-                if isinstance(segm, dict):
-                    if isinstance(segm["counts"], list):
-                        # convert to compressed RLE
-                        segm = mask_util.frPyObjects(segm, *segm["size"])
-                else:
-                    # filter out invalid polygons (< 3 points)
-                    segm = [poly for poly in segm if len(poly) % 2 == 0 and len(poly) >= 6]
-                    if len(segm) == 0:
-                        num_instances_without_valid_segmentation += 1
-                        continue  # ignore this instance
-                obj["segmentation"] = segm
-
-            keypts = anno.get("keypoints", None)
-            if keypts:  # list[int]
-                for idx, v in enumerate(keypts):
-                    if idx % 3 != 2:
-                        # COCO's segmentation coordinates are floating points in [0, H or W],
-                        # but keypoint coordinates are integers in [0, H-1 or W-1]
-                        # Therefore we assume the coordinates are "pixel indices" and
-                        # add 0.5 to convert to floating point coordinates.
-                        keypts[idx] = v + 0.5
-                obj["keypoints"] = keypts
-
-            obj["bbox_mode"] = BoxMode.XYWH_ABS
-
-            objs.append(obj)
-
-        record["annotations"] = objs
-        record["sem_seg"] = process_semantic_mask(record)
-        dataset_dicts.append(record)
-
-    if num_instances_without_valid_segmentation > 0:
-        logger.warning(
-            "Filtered out {} instances without valid segmentation. ".format(
-                num_instances_without_valid_segmentation
-            )
-            + "There might be issues in your dataset generation process.  Please "
-            "check https://detectron2.readthedocs.io/en/latest/tutorials/datasets.html carefully"
-        )
-    return dataset_dicts
-
-def split_n_prepare_turtle_coco(data_dir: str, dev_mode: bool = False):
+def split_n_prepare_turtle_coco(data_dir: str, dev_mode: bool = False, test_only: bool = False):
     """
     Process and prepare the turtle dataset under data_dir.
 
@@ -349,6 +262,10 @@ def split_n_prepare_turtle_coco(data_dir: str, dev_mode: bool = False):
     for split_name, img_ids in zip(
         ["train", "valid", "test"], [train_ids, valid_ids, test_ids]
     ):
+        if test_only:
+            if split_name != "test":
+                continue
+
         logger.info(f"Preprocessing and registering for {split_name} data...")
 
         # Process and register the turtle body parts dataset
@@ -462,33 +379,3 @@ def process_ann(anns, coco):
                 ann["bbox"] = [0, 0, 0, 0]
 
     return anns
-
-
-def process_semantic_mask(data: dict):
-    """
-    Adds a semantic segmentation mask `sem_seg` to the input image data dictionary.
-    
-    Args:
-        data (dict): A dictionary containing annotations for an image.
-        
-    Returns:
-        dict: The updated dictionary with a semantic segmentation mask.
-    """
-    # Initialize a blank mask for the entire image
-    height, width = data["height"], data["width"]
-    sem_seg = np.zeros((height, width), dtype=np.uint8)
-    
-    # Loop through each annotation and fill the mask
-    for ann in data["annotations"]:
-        # Get the category_id to fill in the mask
-        category_id = ann["category_id"]
-        
-        # Decode the segmentation mask (accept RLE byte string only)
-        mask = mask_util.decode(ann["segmentation"])
-
-        # Update the semantic segmentation mask with the category_id
-        sem_seg[mask == 1] = category_id
-
-    # Add the semantic mask to the data dictionary
-    data["sem_seg"] = sem_seg
-    return data
