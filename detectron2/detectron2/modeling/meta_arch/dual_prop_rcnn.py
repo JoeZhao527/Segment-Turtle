@@ -90,10 +90,11 @@ class DualProposalRCNNSingleHead(GeneralizedRCNN):
             # Separate instances by category: super-category (3) and sub-categories (0, 1, 2)
             super_category_mask = (r.pred_classes == 3)
             sub_category_mask = ~super_category_mask
-
+            
             super_instances = r[super_category_mask]
             sub_instances = r[sub_category_mask]
-
+            print(len(super_instances), len(sub_instances))
+            exit(0)
             # If there are no super-category instances, skip filtering
             if len(super_instances) > 0 and len(sub_instances) > 0:
                 # Ensure pred_boxes are in the Boxes format
