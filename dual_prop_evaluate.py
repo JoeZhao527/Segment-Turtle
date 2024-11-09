@@ -76,7 +76,7 @@ def setup():
                        help='Score threshold for evaluation')
     args = parser.parse_args()
     
-    output_dir = os.path.join(args.output_dir, f"thr_{args.score_thresh.replace('.', '_')}")
+    output_dir = os.path.join(args.output_dir, f"thr_{str(args.score_thresh).replace('.', '_')}")
     assert not os.path.exists(output_dir), f"Output directory {output_dir} already exists"
 
     cfg = get_cfg()
