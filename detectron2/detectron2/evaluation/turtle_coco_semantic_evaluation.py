@@ -62,7 +62,9 @@ class TurtleSemSegEvaluator(SemSegEvaluator):
             }
 
     def evaluate(self):
-        print(self.turle_mask_predictions)
+        k = list(self.turle_mask_predictions.keys())[0]
+        for key, value in self.turle_mask_predictions[k].items():
+            print(key, type(value))
         exit(0)
         if self._output_dir:
             PathManager.mkdirs(self._output_dir)
