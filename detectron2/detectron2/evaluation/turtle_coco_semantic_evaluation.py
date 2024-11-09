@@ -62,10 +62,6 @@ class TurtleSemSegEvaluator(SemSegEvaluator):
             }
 
     def evaluate(self):
-        k = list(self.turle_mask_predictions.keys())[0]
-        for key, value in self.turle_mask_predictions[k].items():
-            print(key, type(value))
-        exit(0)
         if self._output_dir:
             PathManager.mkdirs(self._output_dir)
             file_path = os.path.join(self._output_dir, "sem_seg_predictions.json")
@@ -127,4 +123,4 @@ def compute_iou(pred, target, class_id):
     target_binary = (target == class_id).astype(np.uint8)
     intersection = np.logical_and(pred_binary, target_binary).sum()
     union = np.logical_or(pred_binary, target_binary).sum()
-    return intersection / union if union != 0 else 0
+    return float(intersection / union) if union != 0 else 0.0
