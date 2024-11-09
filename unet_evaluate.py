@@ -98,6 +98,6 @@ if __name__ == '__main__':
     predictor = DefaultPredictor(cfg)
 
     evaluator = TurtleSemSegEvaluator("turtle_parts_test", output_dir=cfg.OUTPUT_DIR)
-    mapper = TurtleSemanticDatasetMapper(cfg, is_train=True)
+    mapper = TurtleSemanticDatasetMapper(cfg, is_train=False)
     tst_loader = build_detection_test_loader(cfg, "turtle_parts_test", mapper=mapper)
     print(inference_on_dataset(predictor.model, tst_loader, evaluator))
