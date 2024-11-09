@@ -108,12 +108,11 @@ def encode_multi_class_mask(mask):
     unique_classes = np.unique(mask)
 
     for _cls in unique_classes:
+        class_id = int(_cls)
         binary_mask = (mask == _cls).astype(np.uint8)
         rle = mask_util.encode(np.asfortranarray(binary_mask))
-
         rle["counts"] = rle["counts"].decode("utf-8")
-
-        rle_dict[_cls] = rle
+        rle_dict[class_id] = rle
 
     return rle_dict
 
