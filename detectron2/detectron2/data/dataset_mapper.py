@@ -271,24 +271,25 @@ def focused_cropping(image: np.ndarray, mask: np.ndarray, background_mask: np.nd
     y_coords, x_coords = np.where(background_mask == 0)
 
     # Get bounding positions
-    x_min, x_max = np.min(x_coords), np.max(x_coords)
     y_min, y_max = np.min(y_coords), np.max(y_coords)
+    x_min, x_max = np.min(x_coords), np.max(x_coords)
 
     # Calculate padding (50% of object size)
-    x_padding = int((x_max - x_min) * focus_crop_ratio)
     y_padding = int((y_max - y_min) * focus_crop_ratio)
-
+    x_padding = int((x_max - x_min) * focus_crop_ratio)
+    
     # Calculate crop positions with padding
-    x_start = max(0, x_min - x_padding)
     y_start = max(0, y_min - y_padding)
-    x_end = min(x_max+x_padding, background_mask.shape[1])
+    x_start = max(0, x_min - x_padding)
+    
     y_end = min(y_max+y_padding, background_mask.shape[0])
+    x_end = min(x_max+x_padding, background_mask.shape[1])
 
-    original_height = background_mask.shape[1]
-    original_width = background_mask.shape[0]
+    original_height = background_mask.shape[0]
+    original_width = background_mask.shape[1]
 
     # Get crop coordinates
-    crop_pos = (x_start, y_start, original_height, original_width)
+    crop_pos = (y_start, x_start, original_height, original_width)
 
     # Crop the mask and the image
     cropped_mask = mask[y_start:y_end, x_start:x_end]
