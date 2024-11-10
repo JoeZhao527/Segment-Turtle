@@ -137,7 +137,7 @@ def pad_mask_to_original_size(mask, crop_pos):
     Returns:
         np.ndarray: Padded mask of original image size (H, W)
     """
-    x_start, y_start, orig_height, orig_width = crop_pos
+    y_start, x_start, orig_height, orig_width = crop_pos
 
     # Create empty mask of original size
     padded_mask = np.zeros((orig_height, orig_width), dtype=mask.dtype)
