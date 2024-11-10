@@ -307,7 +307,7 @@ def init_background_mask_from_path(background_mask_path: str):
     background_mask = {}
     for img_id, pred_res in tqdm(bg_masks.items(), desc="Preparing predicted background"):
         background_mask[int(img_id)] = mask_util.decode(pred_res['pred']['0'])
-        
+
     return background_mask
 
 class TurtleSemanticFocusedDatasetMapper(DatasetMapper):
@@ -366,7 +366,6 @@ class TurtleSemanticFocusedDatasetMapper(DatasetMapper):
         Returns:
             dict: a format that builtin models in detectron2 accept
         """
-        print("Start mapping")
         dataset_dict = copy.deepcopy(dataset_dict)  # it will be modified by code below
         # USER: Write your own image loading if it's not from a file
         image = utils.read_image(dataset_dict["file_name"], format=self.image_format)

@@ -80,7 +80,7 @@ def setup():
                        help='Directory for output files')
     parser.add_argument('--model_path', type=str, default='./output_unet/model_best.pth',
                        help='Path to the model weights')
-    parser.add_argument('--background_path', type=str, default='./output_unet/sem_seg_predictions.json',
+    parser.add_argument('--background_path', type=str, default='./evaluate_unet/sem_seg_predictions.json',
                        help='Path to the model weights')
     parser.add_argument('--focus_crop_ratio', type=float, default=0.5,
                        help='Ratio to compute margin for cropping object region')
