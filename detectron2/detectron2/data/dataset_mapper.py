@@ -306,10 +306,8 @@ def init_background_mask_from_path(background_mask_path: str):
 
     background_mask = {}
     for img_id, pred_res in tqdm(bg_masks.items(), desc="Preparing predicted background"):
-        background_mask[int(img_id)] = mask_util.decode(pred_res['pred'])
-        print(background_mask[int(img_id)].shape)
-        exit(0)
-
+        background_mask[int(img_id)] = mask_util.decode(pred_res['pred']['0'])
+        
     return background_mask
 
 class TurtleSemanticFocusedDatasetMapper(DatasetMapper):
