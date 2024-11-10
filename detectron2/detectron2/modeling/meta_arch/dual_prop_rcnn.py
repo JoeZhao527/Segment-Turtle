@@ -93,8 +93,7 @@ class DualProposalRCNNSingleHead(GeneralizedRCNN):
             
             super_instances = r[super_category_mask]
             sub_instances = r[sub_category_mask]
-            print(len(super_instances), len(sub_instances))
-            exit(0)
+            
             # If there are no super-category instances, skip filtering
             if len(super_instances) > 0 and len(sub_instances) > 0:
                 # Ensure pred_boxes are in the Boxes format
@@ -110,12 +109,7 @@ class DualProposalRCNNSingleHead(GeneralizedRCNN):
                 
                 # Determine which sub-instances have a sufficient intersection with any super-instance
                 valid_sub_instance_mask = (intersection_ratios > threshold).any(dim=1)
-                print(intersection_matrix)
-                print(sub_areas)
-                print(intersection_ratios)
-                print(valid_sub_instance_mask)
-                print(" === ")
-                print()
+
                 # Filter the sub-instances that meet the intersection ratio criterion
                 filtered_sub_instances = sub_instances[valid_sub_instance_mask]
 

@@ -94,6 +94,61 @@ class TurtleSemSegEvaluator(SemSegEvaluator):
         return res
 
 
+class TurtleFocusSemSegEvaluator(TurtleSemSegEvaluator):
+    """
+    This include recover original image size from focus cropped image
+    """
+    def process(self, inputs, outputs):
+        for input, output in zip(inputs, outputs):
+            output = output["sem_seg"].argmax(dim=0).to(self._cpu_device)
+            pred = np.array(output, dtype=int)
+
+            # Recover the original image size
+            pad_mask_to_original_size(pred, input['crop_pos'])
+            
+            # original resolution ground truth is in numpy.array.
+            # Reference to data.dataset_mapper.TurtleSemanticDatasetMapper
+            gt = input["sem_seg_gt"]
+
+            # Convert pred and gt to RLE format
+            pred_rle = encode_multi_class_mask(pred)
+            gt_rle = encode_multi_class_mask(gt)
+
+            self.turle_mask_predictions = {
+                **self.turle_mask_predictions,
+                input["image_id"]: {
+                    "gt": gt_rle,
+                    "pred": pred_rle,
+                    "turtle_iou": compute_iou(pred, gt, 1),
+                    "flippers_iou": compute_iou(pred, gt, 2),
+                    "head_iou": compute_iou(pred, gt, 3),
+                }
+            }
+
+
+def pad_mask_to_original_size(mask, crop_pos):
+    """
+    Pad the cropped mask back to original image size using crop position information
+    
+    Args:
+        mask (np.ndarray): Cropped mask of shape (H', W')
+        crop_pos (tuple): Tuple of (x_start, y_start, orig_height, orig_width)
+        
+    Returns:
+        np.ndarray: Padded mask of original image size (H, W)
+    """
+    x_start, y_start, orig_height, orig_width = crop_pos
+    
+    # Create empty mask of original size
+    padded_mask = np.zeros((orig_height, orig_width), dtype=mask.dtype)
+    
+    # Insert cropped mask at correct position
+    h, w = mask.shape
+    padded_mask[y_start:y_start+h, x_start:x_start+w] = mask
+    
+    return padded_mask
+
+
 def encode_multi_class_mask(mask):
     """
     Encode a multi-class mask into RLE format for each class.
