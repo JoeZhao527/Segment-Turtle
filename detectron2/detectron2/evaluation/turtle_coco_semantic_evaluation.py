@@ -104,7 +104,7 @@ class TurtleFocusSemSegEvaluator(TurtleSemSegEvaluator):
             pred = np.array(output, dtype=int)
 
             # Recover the original image size
-            pad_mask_to_original_size(pred, input['crop_pos'])
+            pred = pad_mask_to_original_size(pred, input['crop_pos'])
 
             # original resolution ground truth is in numpy.array.
             # Reference to data.dataset_mapper.TurtleSemanticDatasetMapper
@@ -144,10 +144,6 @@ def pad_mask_to_original_size(mask, crop_pos):
 
     # Insert cropped mask at correct position
     h, w = mask.shape
-
-    print(y_start+h, x_start+w)
-    print(padded_mask.shape)
-    print(mask.shape)
 
     padded_mask[y_start:y_start+h, x_start:x_start+w] = mask
     
