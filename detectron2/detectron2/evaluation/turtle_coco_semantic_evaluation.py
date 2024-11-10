@@ -132,7 +132,7 @@ def pad_mask_to_original_size(mask, crop_pos):
     
     Args:
         mask (np.ndarray): Cropped mask of shape (H', W')
-        crop_pos (tuple): Tuple of (x_start, y_start, orig_height, orig_width)
+        crop_pos (tuple): Tuple of (y_start, x_start, orig_height, orig_width)
         
     Returns:
         np.ndarray: Padded mask of original image size (H, W)
@@ -148,7 +148,7 @@ def pad_mask_to_original_size(mask, crop_pos):
     print(y_start+h, x_start+w)
     print(padded_mask.shape)
     print(mask.shape)
-    
+
     padded_mask[y_start:y_start+h, x_start:x_start+w] = mask
     
     return padded_mask
