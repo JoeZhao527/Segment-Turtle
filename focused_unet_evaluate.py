@@ -82,6 +82,8 @@ def setup():
                        help='Path to the model weights')
     parser.add_argument('--background_path', type=str, default='./output_unet/sem_seg_predictions.json',
                        help='Path to the model weights')
+    parser.add_argument('--focus_crop_ratio', type=float, default=0.5,
+                       help='Ratio to compute margin for cropping object region')
     args = parser.parse_args()
 
     assert not os.path.exists(args.output_dir), f"Output directory {args.output_dir} already exists"
@@ -93,7 +95,8 @@ def setup():
 
     cfg.MODEL.WEIGHTS = args.model_path
     cfg.BACKGROUND_MASK_PATH = args.background_path
-    cfg.FOCUS_CROP_RATIO = 0.5
+    
+    cfg.FOCUS_CROP_RATIO = args.focus_crop_ratio
     return cfg
 
 if __name__ == '__main__':
