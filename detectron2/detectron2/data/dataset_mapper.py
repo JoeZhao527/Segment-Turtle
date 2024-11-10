@@ -384,6 +384,9 @@ class TurtleSemanticFocusedDatasetMapper(DatasetMapper):
         # Record crop position
         dataset_dict["crop_pos"] = crop_pos
 
+        # Update the curent image shape
+        dataset_dict["height"], dataset_dict["width"] = image.shape[:2]
+        
         aug_input = T.AugInput(image, sem_seg=sem_seg_gt)
         transforms = self.augmentations(aug_input)
         image, sem_seg_gt = aug_input.image, aug_input.sem_seg
