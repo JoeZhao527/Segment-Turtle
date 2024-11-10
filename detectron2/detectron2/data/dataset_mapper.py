@@ -270,8 +270,8 @@ def focused_cropping(image: np.ndarray, mask: np.ndarray, background_mask: np.nd
     # Find object positions (where mask is 0)
     y_coords, x_coords = np.where(background_mask == 0)
 
-    # Handle case where no foreground pixels are found
-    if len(y_coords) == 0 or len(x_coords) == 0:
+    # Handle case where limited foreground pixels are found
+    if len(y_coords) <= 10 or len(x_coords) <= 10:
         # Return original image and mask without cropping
         original_height = background_mask.shape[0]
         original_width = background_mask.shape[1]
