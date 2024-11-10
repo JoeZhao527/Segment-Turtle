@@ -387,8 +387,6 @@ class TurtleSemanticFocusedDatasetMapper(DatasetMapper):
         # Update the curent image shape
         dataset_dict["height"], dataset_dict["width"] = image.shape[:2]
 
-        print(dataset_dict.keys())
-        exit(0)
         aug_input = T.AugInput(image, sem_seg=sem_seg_gt)
         transforms = self.augmentations(aug_input)
         image, sem_seg_gt = aug_input.image, aug_input.sem_seg
@@ -421,7 +419,5 @@ class TurtleSemanticFocusedDatasetMapper(DatasetMapper):
             # USER: Modify this if you want to keep them for some reason.
             dataset_dict.pop("annotations", None)
             return dataset_dict
-
-        
 
         return dataset_dict
