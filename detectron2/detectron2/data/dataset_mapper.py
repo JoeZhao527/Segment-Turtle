@@ -284,8 +284,8 @@ def focused_cropping(image: np.ndarray, mask: np.ndarray, background_mask: np.nd
     x_end = min(x_max+x_padding, background_mask.shape[1])
     y_end = min(y_max+y_padding, background_mask.shape[0])
 
-    height = y_start - y_end
-    width = x_start - x_end
+    height = y_end - y_start
+    width = x_end - x_start
 
     # Get crop coordinates
     crop_pos = (x_start, y_start, height, width)
