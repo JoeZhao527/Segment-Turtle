@@ -264,7 +264,7 @@ def focused_cropping(image: np.ndarray, mask: np.ndarray, background_mask: np.nd
     
     Returns:
         image (H' * W' * 3): cropped image
-        mask (H' * W'): cropped mask
+        mask (H' * W'): cropped ground truth mask
         crop_pos (tuple): a tuple contains (y-start, x-start, H, W) for recovering original image size for cropped mask
     """
     # Find object positions (where mask is 0)
