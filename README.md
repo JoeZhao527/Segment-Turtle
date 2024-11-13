@@ -18,7 +18,7 @@ To setup dataset, download the dataset from kaggle: https://www.kaggle.com/datas
 
 All of our methods accept an input of `data_dir`. The input `data_dir` can be verified as the following:
 
-Run this command to check if the data directory is correct. Assume the downloaded data is under ./turtles-data
+Run this command to check if the data directory is correct. Assume the downloaded data is under `./turtles-data`
 ```
 ls ./turtles-data/data
 ```
