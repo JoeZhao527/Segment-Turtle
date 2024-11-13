@@ -5,7 +5,7 @@
 ### Software Enviroment
 We developed and tested our methods with pytroch 2.0.0 official docker image (https://hub.docker.com/layers/pytorch/pytorch/2.0.0-cuda11.7-cudnn8-devel/images/sha256-96ccb2997a131f2455d70fb78dbb284bafe4529aaf265e344bae932c8b32b2a4?context=explore).
 
-We strongly recommend you to setup the docker container for a stable enviroment.
+We strongly recommend you to setup the docker container for a stable enviroment. You will need to mount the paths and gpus approriately on your own devices if you use docker container.
 
 ### Setup the codebase
 Change your current working directory to the same directory with this README. Run the following command to find the entry points of all our 4 methods. If you got no error, then you are in the correct directory!
@@ -34,9 +34,20 @@ Setup detectron2 (for training / evaluation loop and native Mask R-CNN implement
 python ./scripts/detectron2_setup.py
 ```
 
-Setup segmentation-models-pytorch (for native U-Net implementation)
+Setup segmentation-models-pytorch (for native U-Net implementation) and other dependencies
 ```
-pip install segmentation-models-pytorch
+pip install -r requirements.txt
+```
+
+Setup opencv-python
+If you are using the docker container:
+```
+pip install opencv-python-headless
+```
+
+If you are using standard desktop environments
+```
+pip install opencv-python
 ```
 
 ## Output
