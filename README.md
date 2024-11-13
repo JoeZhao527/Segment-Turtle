@@ -30,17 +30,19 @@ annotations.json  images  metadata.csv  metadata_splits.csv
 ```
 
 ### Install Dependencies
-Setup detectron2 (for training / evaluation loop and native Mask R-CNN implementation):
+
+#### Setup detectron2 (for training / evaluation loop and native Mask R-CNN implementation):
 ```
 python ./scripts/detectron2_setup.py
 ```
 
-Setup segmentation-models-pytorch (for native U-Net implementation) and other dependencies
+#### Setup segmentation-models-pytorch (for native U-Net implementation) and other dependencies
 ```
 pip install -r requirements.txt
 ```
 
-Setup opencv-python
+#### Setup opencv-python
+
 If you are using the docker container:
 ```
 pip install opencv-python-headless
