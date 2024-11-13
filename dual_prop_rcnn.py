@@ -82,7 +82,6 @@ def setup():
     register_dataset(cfg, args.dev, args.data_dir)
     prepare_model(cfg, args.dev, args.output_dir)
 
-    cfg.MODEL.WEIGHTS = os.path.join(cfg.OUTPUT_DIR, "model_best.pth")
     cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = args.score_thresh
 
     os.makedirs(cfg.OUTPUT_DIR, exist_ok=False)
@@ -96,8 +95,9 @@ if __name__ == '__main__':
     trainer.resume_or_load(resume=False)
     trainer.train()
 
+    cfg.MODEL.WEIGHTS = os.path.join(cfg.OUTPUT_DIR, "model_best.pth")
     predictor = DefaultPredictor(cfg)
-
+    
     evaluator = TurtleCOCOEvaluator("turtle_parts_test", output_dir=cfg.OUTPUT_DIR)
     tst_loader = build_detection_test_loader(cfg, "turtle_parts_test")
     print(inference_on_dataset(predictor.model, tst_loader, evaluator))
