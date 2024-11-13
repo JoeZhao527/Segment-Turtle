@@ -61,28 +61,28 @@ Run the following command for a quick test of all methods. This should takes no 
 
 ## Training and Evaluation
 
-Train and evaluate native Mask R-CNN:
+1. Train and evaluate native Mask R-CNN:
 ```
 python mask_rcnn_train.py \
   --data_dir=./turtles-data/data \
   --output_dir=./output_mask_rcnn
 ```
 
-Train and evaluate Daul Proposal Mask R-CNN (DPMR)
+2. Train and evaluate Daul Proposal Mask R-CNN (DPMR)
 ```
 python dual_prop_rcnn.py \
   --data_dir=./turtles-data/data \
   --output_dir=./output_dual_prop_rcnn
 ```
 
-Train and evaluate native U-Net
+3. Train and evaluate native U-Net
 ```
 python unet_train.py \
   --data_dir=./turtles-data/data \
   --output_dir=./output_unet
 ```
 
-Train and evaluate U-Net on Focus (UFO)
+4. Evaluate U-Net on Focus (UFO) with the trained U-Net (Notice: this have to be ran after running 3. to get the trained weights and first stage prediction of the U-Net)
 ```
 python focused_unet_evaluate.py \
   --data_dir=./turtles-data/data \
@@ -100,7 +100,7 @@ For each training model, there are following files in the output directory:
 
 `model_best.pth`: The best checkpoint selected based on the validation performance. We used that to perform prediction and testing on test set
 
-`coco_instances_results.json` (mask2former, mask-rcnn): contains the prediction results for the test set, based on the best model checkpoint during training. See `instance_analysis.ipynb` for an demo of processing the file, evaluation and analysis. The json is structured as following:
+`coco_instances_results.json` (mask-rcnn): contains the prediction results for the test set, based on the best model checkpoint during training. See `instance_analysis.ipynb` for an demo of processing the file, evaluation and analysis. The json is structured as following:
 
 ```python
 {
@@ -126,7 +126,7 @@ For each training model, there are following files in the output directory:
 }
 ```
 
-`coco_instances_results.json` (unet, deeplab, fcn): contains the prediction results for the test set, based on the best model checkpoint during training. The content is structured as following:
+`coco_instances_results.json` (unet): contains the prediction results for the test set, based on the best model checkpoint during training. The content is structured as following:
 
 ```python
 {
