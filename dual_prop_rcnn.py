@@ -27,8 +27,8 @@ from detectron2.data.datasets.turtle_dual_proposal_rcnn import split_n_prepare_t
 
 import argparse
 
-def register_dataset(cfg, dev_mode):
-    base_dir = "./turtles-data/data"
+def register_dataset(cfg, dev_mode, data_dir):
+    base_dir = data_dir
 
     datasets = split_n_prepare_turtle_coco(base_dir, dev_mode=dev_mode)
 
@@ -70,12 +70,14 @@ def setup():
     parser.add_argument('--dev', action='store_true', help='Enable development mode')
     parser.add_argument('--output_dir', type=str, default='./output_dual_prop_rcnn',
                        help='Directory for output files')
+    parser.add_argument('--data_dir', type=str, default='./turtles-data/data',
+                       help='Directory containing the dataset')
     args = parser.parse_args()
     
     assert not os.path.exists(args.output_dir), f"Output directory {args.output_dir} already exists"
 
     cfg = get_cfg()
-    register_dataset(cfg, args.dev)
+    register_dataset(cfg, args.dev, args.data_dir)
     prepare_model(cfg, args.dev, args.output_dir)
     os.makedirs(cfg.OUTPUT_DIR, exist_ok=False)
 
