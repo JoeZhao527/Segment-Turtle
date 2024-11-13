@@ -11,7 +11,7 @@ setup_logger()
 
 # import some common libraries
 import numpy as np
-import os, json, cv2, random
+import os, json, random
 
 # import some common detectron2 utilities
 from detectron2 import model_zoo
