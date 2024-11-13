@@ -31,14 +31,14 @@ annotations.json  images  metadata.csv  metadata_splits.csv
 
 ### Install Dependencies
 
-#### Setup detectron2 (for training / evaluation loop and native Mask R-CNN implementation):
-```
-python ./scripts/detectron2_setup.py
-```
-
 #### Setup segmentation-models-pytorch (for native U-Net implementation) and other dependencies
 ```
 pip install -r requirements.txt
+```
+
+#### Setup detectron2 (for training / evaluation loop and native Mask R-CNN implementation):
+```
+python ./scripts/detectron2_setup.py
 ```
 
 #### Setup opencv-python
@@ -51,6 +51,45 @@ pip install opencv-python-headless
 If you are using standard desktop environments
 ```
 pip install opencv-python
+```
+
+## Quick Testing
+Run the following command for a quick test of all methods. This should takes no more than 10 minutes:
+```
+./scripts/deployment_test.sh
+```
+
+## Training and Evaluation
+
+Train and evaluate native Mask R-CNN:
+```
+python mask_rcnn_train.py \
+  --data_dir=./turtles-data/data \
+  --output_dir=./output_mask_rcnn
+```
+
+Train and evaluate Daul Proposal Mask R-CNN (DPMR)
+```
+python dual_prop_rcnn.py \
+  --data_dir=./turtles-data/data \
+  --output_dir=./output_dual_prop_rcnn
+```
+
+Train and evaluate native U-Net
+```
+python unet_train.py \
+  --data_dir=./turtles-data/data \
+  --output_dir=./output_unet
+```
+
+Train and evaluate U-Net on Focus (UFO)
+```
+python focused_unet_evaluate.py \
+  --data_dir=./turtles-data/data \
+  --output_dir=./focused_unet_results \
+  --model_path=./output_unet/model_best.pth \
+  --background_path=./output_unet/sem_seg_predictions.json \
+  --focus_crop_ratio=0.1
 ```
 
 ## Output
