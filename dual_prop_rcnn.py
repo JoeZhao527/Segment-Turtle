@@ -72,7 +72,7 @@ def setup():
                        help='Directory for output files')
     parser.add_argument('--data_dir', type=str, default='./turtles-data/data',
                        help='Directory containing the dataset')
-    parser.add_argument('--score_thresh', type=float, default=0.7,
+    parser.add_argument('--score_thresh', type=float, default=0.8,
                        help='Score threshold for evaluation')
     args = parser.parse_args()
     
