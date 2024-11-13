@@ -29,8 +29,14 @@ annotations.json  images  metadata.csv  metadata_splits.csv
 ```
 
 ### Install Dependencies
+Setup detectron2 (for training / evaluation loop and native Mask R-CNN implementation):
 ```
 python ./scripts/detectron2_setup.py
+```
+
+Setup segmentation-models-pytorch (for native U-Net implementation)
+```
+pip install segmentation-models-pytorch
 ```
 
 ## Output
