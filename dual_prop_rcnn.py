@@ -72,6 +72,8 @@ def setup():
                        help='Directory for output files')
     parser.add_argument('--data_dir', type=str, default='./turtles-data/data',
                        help='Directory containing the dataset')
+    parser.add_argument('--score_thresh', type=float, default=0.7,
+                       help='Score threshold for evaluation')
     args = parser.parse_args()
     
     assert not os.path.exists(args.output_dir), f"Output directory {args.output_dir} already exists"
@@ -79,6 +81,10 @@ def setup():
     cfg = get_cfg()
     register_dataset(cfg, args.dev, args.data_dir)
     prepare_model(cfg, args.dev, args.output_dir)
+
+    cfg.MODEL.WEIGHTS = os.path.join(cfg.OUTPUT_DIR, "model_best.pth")
+    cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = args.score_thresh
+
     os.makedirs(cfg.OUTPUT_DIR, exist_ok=False)
 
     return cfg
@@ -90,8 +96,6 @@ if __name__ == '__main__':
     trainer.resume_or_load(resume=False)
     trainer.train()
 
-    cfg.MODEL.WEIGHTS = os.path.join(cfg.OUTPUT_DIR, "model_best.pth")  # path to the model we just trained
-    cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = 0.7   # set a custom testing threshold
     predictor = DefaultPredictor(cfg)
 
     evaluator = TurtleCOCOEvaluator("turtle_parts_test", output_dir=cfg.OUTPUT_DIR)
