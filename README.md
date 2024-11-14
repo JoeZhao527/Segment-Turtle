@@ -29,7 +29,7 @@ cd Segment-Turtle-main
 
 And copy the dataset to the codebase
 ```
-cp -r turtles-data
+cp -r ../turtles-data ./
 ```
 
 ## Install Dependencies
