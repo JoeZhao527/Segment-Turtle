@@ -4,11 +4,7 @@
 To setup dataset, download the dataset from kaggle: https://www.kaggle.com/datasets/wildlifedatasets/seaturtleid2022. After unzip the downloaded data, you should see a directory called `turtles-data`. Move that to the root directory of our project.
 
 ## Prepare Working Directory
-After the dataset and our code is downloaded, we will have a working directory with four files:
-`license.txt` for the dataset license,
-`seaturtleid2022.zip` for the dataset zip file
-`Segment-Turtle-main.zip` for our submitted code zip file, and
-`turtles-data` for the unzipped dataset
+After the dataset and our code is downloaded, we will have a working directory with the dataset directory at `turtles-data`, and our submitted codebase at `Segment-Turtle-main`.
 
 ## Enviroment Setup
 We used docker to ensure a stable reproduction of our methods. First pull the docker image from pytorch official release:
@@ -26,12 +22,7 @@ Next, we get in to the container to run our models. By correctly mounting the wo
 docker exec -it turtle /bin/bash
 ```
 
-Then we unzip the codebase
-```
-unzip Segment-Turtle-main.zip
-```
-
-Change the working directory to the project codebase
+Then change the working directory to the project codebase
 ```
 cd Segment-Turtle-main
 ```
