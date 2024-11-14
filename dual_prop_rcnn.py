@@ -97,7 +97,13 @@ if __name__ == '__main__':
 
     cfg.MODEL.WEIGHTS = os.path.join(cfg.OUTPUT_DIR, "model_best.pth")
     predictor = DefaultPredictor(cfg)
-    
+
     evaluator = TurtleCOCOEvaluator("turtle_parts_test", output_dir=cfg.OUTPUT_DIR)
     tst_loader = build_detection_test_loader(cfg, "turtle_parts_test")
-    print(inference_on_dataset(predictor.model, tst_loader, evaluator))
+
+    # Dumping the result to a json file
+    result = inference_on_dataset(predictor.model, tst_loader, evaluator)
+    print(result)
+    
+    with open(os.path.join(cfg.OUTPUT_DIR, "result.json"), "w") as f:
+        json.dump(result, f)

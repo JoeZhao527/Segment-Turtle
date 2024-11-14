@@ -9,45 +9,22 @@ import detectron2
 from detectron2.utils.logger import setup_logger
 setup_logger()
 
-# import some common libraries
-import numpy as np
-import os, json, random
-
 # import some common detectron2 utilities
 from detectron2 import model_zoo
 from detectron2.engine import DefaultPredictor
 from detectron2.engine.trainer import CustomTrainer
 from detectron2.config import get_cfg
-from detectron2.utils.visualizer import Visualizer
-from detectron2.data import MetadataCatalog, DatasetCatalog
 
-from detectron2.evaluation import COCOEvaluator, inference_on_dataset
+from detectron2.evaluation import inference_on_dataset
 from detectron2.evaluation.turtle_coco_evaluation import TurtleCOCOEvaluator
 from detectron2.data import build_detection_test_loader
 
-# if your dataset is in COCO format, this cell can be replaced by the following three lines:
-from detectron2.data.datasets import register_coco_instances
-from detectron2.data.datasets.turtle_coco import split_n_prepare_turtle_coco, register_turtle_coco
-
+import cv2
+import json
 import argparse  # Add this import at the top
-
-def register_dataset(cfg, dev_mode, data_dir):
-    base_dir = data_dir
-    datasets = split_n_prepare_turtle_coco(base_dir, dev_mode=dev_mode)
-
-    for _name, _data in datasets.items():
-        register_turtle_coco(_data, _name, base_dir)
-    
-    cfg.DATASETS.TRAIN = ("turtle_parts_train",)
-    cfg.DATASETS.TEST = ("turtle_parts_valid",)
-
 
 def prepare_model(cfg, dev_mode, output_dir):
     cfg.merge_from_file(model_zoo.get_config_file("COCO-InstanceSegmentation/mask_rcnn_R_50_C4_3x.yaml"))
-
-    # Switch the valid and test split, as the detectron2 uses cfg.DATASETS.TEST for validation
-    cfg.DATASETS.TRAIN = ("turtle_parts_train",)
-    cfg.DATASETS.TEST = ("turtle_parts_valid",)
 
     cfg.DATALOADER.NUM_WORKERS = 1
     cfg.MODEL.WEIGHTS = model_zoo.get_checkpoint_url("COCO-InstanceSegmentation/mask_rcnn_R_50_C4_3x.yaml")
@@ -71,39 +48,29 @@ def prepare_model(cfg, dev_mode, output_dir):
 def setup():
     parser = argparse.ArgumentParser()
     parser.add_argument('--dev', action='store_true', help='Enable development mode')
-    parser.add_argument('--output_dir', type=str, default='./output_mask_rcnn',
+    parser.add_argument('--output_dir', type=str, default='./predict_mask_rcnn',
                        help='Directory for output files')
-    parser.add_argument('--data_dir', type=str, default='./turtles-data/data',
-                       help='Directory containing the dataset')
+    parser.add_argument('--data_path', type=str, default='./turtles-data/data/images/t001/anuJvqUqBB.JPG',
+                       help='Path to the image to be predicted')
     args = parser.parse_args()
-
-    assert not os.path.exists(args.output_dir), f"Output directory {args.output_dir} already exists"
     
     cfg = get_cfg()
-    register_dataset(cfg, args.dev, args.data_dir)
     prepare_model(cfg, args.dev, args.output_dir)
     os.makedirs(cfg.OUTPUT_DIR, exist_ok=False)
 
-    return cfg
+    return cfg, args
 
 if __name__ == '__main__':
-    cfg = setup()
-
-    trainer = CustomTrainer(cfg)
-    trainer.resume_or_load(resume=False)
-    trainer.train()
-
+    cfg, args = setup()
+    
     cfg.MODEL.WEIGHTS = os.path.join(cfg.OUTPUT_DIR, "model_best.pth")  # path to the model we just trained
-    cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = 0.7   # set a custom testing threshold
     predictor = DefaultPredictor(cfg)
 
-    evaluator = TurtleCOCOEvaluator("turtle_parts_test", output_dir=cfg.OUTPUT_DIR)
-    tst_loader = build_detection_test_loader(cfg, "turtle_parts_test")
+    # Load image and run prediction
+    image = cv2.imread(args.data_path)
+    image_name = args.data_path.split('/')[-1].split('.')[0]
+    outputs = predictor(image)
 
-    # Dumping the result to a json file
-    result = inference_on_dataset(predictor.model, tst_loader, evaluator)
-    print(result)
-    
-    with open(os.path.join(cfg.OUTPUT_DIR, "result.json"), "w") as f:
-        json.dump(result, f)
+    # Save the results
+    torch.save(outputs, os.path.join(cfg.OUTPUT_DIR, f"{image_name}.pth"))
     
