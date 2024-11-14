@@ -14,7 +14,7 @@ docker pull pytorch/pytorch:2.0.0-cuda11.7-cudnn8-devel
 
 Then start a docker container with the pytorch image. You will need to replace the mounted path with the working directory on your own device:
 ```
-docker run -d --name turtle --gpus all -v /home/haokaizhao/scratch/9517/submit:/workspace pytorch/pytorch:2.0.0-cuda11.7-cudnn8-devel tail -f /dev/null
+docker run -d --name turtle --gpus all -v /home/haokaizhao/scratch/9517/submit:/workspace -v /dev/shm:/dev/shm pytorch/pytorch:2.0.0-cuda11.7-cudnn8-devel tail -f /dev/null
 ```
 
 Next, we get in to the container to run our models. By correctly mounting the working directory, you should see the same files as in the step for **Prepare Working Directory**
@@ -89,7 +89,7 @@ python focused_unet_evaluate.py \
 
 ## Output
 
-For each training model, there are following files in the output directory:
+Each training and evaluation script will output following files in the output directory:
 
 `metrics.json`: Contains the losses and intermediate validation mIoU during training process
 
