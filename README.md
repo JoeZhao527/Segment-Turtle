@@ -4,10 +4,10 @@
 To setup dataset, download the dataset from kaggle: https://www.kaggle.com/datasets/wildlifedatasets/seaturtleid2022. After unzip the downloaded data, you should see a directory called `turtles-data`. Move that to the root directory of our project.
 
 ## Prepare Working Directory
-After the data and code is set up, the working directory should have four files:
+After the dataset and our code is downloaded, we will have a working directory with four files:
 `license.txt` for the dataset license,
 `seaturtleid2022.zip` for the dataset zip file
-`Segment-Turtle-main.zip` for our submitted code, and
+`Segment-Turtle-main.zip` for our submitted code zip file, and
 `turtles-data` for the unzipped dataset
 
 ## Enviroment Setup
@@ -31,7 +31,7 @@ Then we unzip the codebase
 unzip Segment-Turtle-main.zip
 ```
 
-Change the working directory the the project codebase
+Change the working directory to the project codebase
 ```
 cd Segment-Turtle-main
 ```
@@ -44,7 +44,7 @@ cp -r turtles-data
 ## Install Dependencies
 We used detectron2 for deep learning pipeline framework and Mask R-CNN implementation. We used pytorch-segmentation-model for U-Net implementation. Our DPMR and UFO are developed based on these softwares.
 
-First setup the detectron2 and install its dependencies:
+First setup the detectron2 and install its requirements:
 ```
 python ./scripts/detectron2_setup.py
 ```
@@ -62,16 +62,16 @@ Now we are ready to train and evaluate the models. Run `./scripts/deployment_tes
 
 ## Training and Evaluation
 
-We have one entry point for each of Mask R-CNN, DPMR, U-Net and UFO. Notice that UFO relies on U-Net results, so it has to be ran after U-Net training and evaluation.
+We have one entry point for each of the Mask R-CNN, DPMR, U-Net and UFO. Notice that UFO relies on the U-Net results, so it has to be ran after U-Net training and evaluation.
 
-1. Train and evaluate standard Mask R-CNN:
+Train and evaluate standard Mask R-CNN by running `mask_rcnn_train.py`:
 ```
 python mask_rcnn_train.py \
   --data_dir=./turtles-data/data \
   --output_dir=./output_mask_rcnn
 ```
 
-2. Train and evaluate Daul Proposal Mask R-CNN (DPMR)
+Train and evaluate DPMR by running `dual_prop_rcnn.py`
 ```
 python dual_prop_rcnn.py \
   --data_dir=./turtles-data/data \
@@ -79,14 +79,14 @@ python dual_prop_rcnn.py \
   --score_thresh=0.6
 ```
 
-3. Train and evaluate standard U-Net
+Train and evaluate standard U-Net by running `unet_train.py`
 ```
 python unet_train.py \
   --data_dir=./turtles-data/data \
   --output_dir=./output_unet
 ```
 
-4. Evaluate U-Net on Focus (UFO) with the trained U-Net (Notice: this have to be ran after running 3. to get the trained weights and first stage prediction of the U-Net)
+Evaluate UFO based on the trained U-Net by running `focused_unet_evaluate.py` (Notice UFO has to be ran after U-Net training to get the trained weights and first stage prediction of the U-Net)
 ```
 python focused_unet_evaluate.py \
   --data_dir=./turtles-data/data \
@@ -102,9 +102,9 @@ For each training model, there are following files in the output directory:
 
 `metrics.json`: Contains the losses and intermediate validation mIoU during training process
 
-`model_best.pth`: The best checkpoint selected based on the validation performance. We used that to perform prediction and testing on test set
+`model_best.pth`: which is the best checkpoint selected based on the validation performance. We used that to perform prediction and testing on test set
 
-`coco_instances_results.json` (mask-rcnn): contains the prediction results for the test set, based on the best model checkpoint during training. See `instance_analysis.ipynb` for an demo of processing the file, evaluation and analysis. The json is structured as following:
+For Mask R-CNN and DPMR, the prediction results are output in `coco_instances_results.json`:
 
 ```python
 {
@@ -130,8 +130,7 @@ For each training model, there are following files in the output directory:
 }
 ```
 
-`coco_instances_results.json` (unet): contains the prediction results for the test set, based on the best model checkpoint during training. The content is structured as following:
-
+For U-Net and UFO, the prediction results are output in `sem_seg_predictions.json`:
 ```python
 {
     # Image id
