@@ -6,13 +6,11 @@
 To setup dataset, download the dataset from kaggle: https://www.kaggle.com/datasets/wildlifedatasets/seaturtleid2022. After unzip the downloaded data, you should see a directory called `turtles-data`. Move that to the root directory of our project.
 
 ### Install Dependencies
-
-#### Setup segmentation-models-pytorch (for native U-Net implementation) and other dependencies
 ```
 pip install -r requirements.txt
 ```
 
-#### Setup detectron2 (for training / evaluation loop and native Mask R-CNN implementation):
+### Setup detectron2 (for training / evaluation loop and native Mask R-CNN implementation):
 ```
 python ./scripts/detectron2_setup.py
 ```
