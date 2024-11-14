@@ -95,4 +95,8 @@ if __name__ == '__main__':
 
     evaluator = TurtleCOCOEvaluator("turtle_parts_test", output_dir=cfg.OUTPUT_DIR)
     tst_loader = build_detection_test_loader(cfg, "turtle_parts_test")
-    print(inference_on_dataset(predictor.model, tst_loader, evaluator))
+
+    # Save the results
+    result = inference_on_dataset(predictor.model, tst_loader, evaluator)
+    with open(os.path.join(cfg.OUTPUT_DIR, "result.json"), "w") as f:
+        json.dump(result, f)

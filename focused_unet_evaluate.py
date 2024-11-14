@@ -60,7 +60,7 @@ def prepare_model(cfg, dev_mode, output_dir):
 
     cfg.DATALOADER.NUM_WORKERS = 1
 
-    cfg.SOLVER.IMS_PER_BATCH = 4  # This is the real "batch size" commonly known to deep learning people
+    cfg.SOLVER.IMS_PER_BATCH = 16  # This is the real "batch size" commonly known to deep learning people
     cfg.SOLVER.BASE_LR = 0.00025  # pick a good LR
     if dev_mode:
         cfg.SOLVER.MAX_ITER = 40
@@ -109,4 +109,8 @@ if __name__ == '__main__':
     evaluator = TurtleFocusSemSegEvaluator("turtle_parts_test", output_dir=cfg.OUTPUT_DIR)
     mapper = TurtleSemanticFocusedDatasetMapper(cfg, is_train=False)
     tst_loader = build_detection_test_loader(cfg, "turtle_parts_test", mapper=mapper)
-    print(inference_on_dataset(predictor.model, tst_loader, evaluator))
+
+    # Save the results
+    result = inference_on_dataset(predictor.model, tst_loader, evaluator)
+    with open(os.path.join(cfg.OUTPUT_DIR, "result.json"), "w") as f:
+        json.dump(result, f)
