@@ -5,10 +5,10 @@ To setup dataset, download the dataset from kaggle: https://www.kaggle.com/datas
 
 ## Prepare Working Directory
 After the data and code is set up, the working directory should have four files:
-`Segment-Turtle-main.zip`: our submitted code
-`seaturtleid2022.zip`: dataset zip file
-`turtles-data`: unzipped dataset
-`license.txt`: dataset license
+`license.txt` for the dataset license,
+`seaturtleid2022.zip` for the dataset zip file
+`Segment-Turtle-main.zip` for our submitted code, and
+`turtles-data` for the unzipped dataset
 
 ## Enviroment Setup
 We used docker to ensure a stable reproduction of our methods. First pull the docker image from pytorch official release:
