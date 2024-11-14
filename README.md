@@ -91,7 +91,7 @@ python focused_unet_evaluate.py \
 
 Each training and evaluation script will output following files in the output directory:
 
-`metrics.json`: Contains the losses and intermediate validation mIoU during training process
+`result.json`: which contains the carapace, flippers and head mIoU, and the average mIoU
 
 `model_best.pth`: which is the best checkpoint selected based on the validation performance. We used that to perform prediction and testing on test set
 
