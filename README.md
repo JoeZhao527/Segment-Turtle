@@ -6,16 +6,6 @@
 To setup dataset, download the dataset from kaggle: https://www.kaggle.com/datasets/wildlifedatasets/seaturtleid2022. After unzip the downloaded data, you should see a directory called `turtles-data`. Move that to the root directory of our project.
 
 ### Install Dependencies
-Create a new conda enviroment
-```
-conda create -n 9517_project python==3.9.20
-```
-
-Activate the conda enviroment
-```
-conda activate 9517_project
-```
-
 Install the packages
 ```
 pip install torch==1.12.1+cu113 torchvision==0.13.1+cu113 --extra-index-url https://download.pytorch.org/whl/cu113
