@@ -5,11 +5,22 @@
 ### Install Dataset
 To setup dataset, download the dataset from kaggle: https://www.kaggle.com/datasets/wildlifedatasets/seaturtleid2022. After unzip the downloaded data, you should see a directory called `turtles-data`. Move that to the root directory of our project.
 
+## Setup
+```
+docker run -d --name turtle --gpus all -v /home/haokaizhao/scratch/9517/submit:/workspace pytorch/pytorch:2.0.0-cuda11.7-cudnn8-devel tail -f /dev/null
+```
+
+```
+docker exec -it turtle /bin/bash
+```
+
 ### Install Dependencies
 Install the packages
 ```
-pip install torch==1.12.1+cu113 torchvision==0.13.1+cu113 --extra-index-url https://download.pytorch.org/whl/cu113
 python ./scripts/detectron2_setup.py
+```
+
+```
 pip install -r requirements.txt
 ```
 
@@ -32,7 +43,8 @@ python mask_rcnn_train.py \
 ```
 python dual_prop_rcnn.py \
   --data_dir=./turtles-data/data \
-  --output_dir=./output_dual_prop_rcnn
+  --output_dir=./output_dual_prop_rcnn \
+  --score_thresh=0.6
 ```
 
 3. Train and evaluate native U-Net
