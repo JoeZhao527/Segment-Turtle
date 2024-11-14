@@ -26,6 +26,21 @@ Next, we get in to the container to run our models. By correctly mounting the wo
 docker exec -it turtle /bin/bash
 ```
 
+Then we unzip the codebase
+```
+unzip Segment-Turtle-main.zip
+```
+
+Change the working directory the the project codebase
+```
+cd Segment-Turtle-main
+```
+
+And copy the dataset to the codebase
+```
+cp -r turtles-data
+```
+
 ## Install Dependencies
 We used detectron2 for deep learning pipeline framework and Mask R-CNN implementation. We used pytorch-segmentation-model for U-Net implementation. Our DPMR and UFO are developed based on these softwares.
 
