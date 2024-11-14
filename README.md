@@ -1,38 +1,55 @@
 # Segment-Turtle
 
-## Installation
-
-### Install Dataset
+## Install Dataset
 To setup dataset, download the dataset from kaggle: https://www.kaggle.com/datasets/wildlifedatasets/seaturtleid2022. After unzip the downloaded data, you should see a directory called `turtles-data`. Move that to the root directory of our project.
 
-## Setup
+## Prepare Working Directory
+After the data and code is set up, the working directory should have four files:
+`Segment-Turtle-main.zip`: our submitted code
+`seaturtleid2022.zip`: dataset zip file
+`turtles-data`: unzipped dataset
+`license.txt`: dataset license
+
+## Enviroment Setup
+We used docker to ensure a stable reproduction of our methods. First pull the docker image from pytorch official release:
+```
+docker pull pytorch/pytorch:2.0.0-cuda11.7-cudnn8-devel
+```
+
+Then start a docker container with the pytorch image. You will need to replace the mounted path with the working directory on your own device:
 ```
 docker run -d --name turtle --gpus all -v /home/haokaizhao/scratch/9517/submit:/workspace pytorch/pytorch:2.0.0-cuda11.7-cudnn8-devel tail -f /dev/null
 ```
 
+Next, we get in to the container to run our models. By correctly mounting the working directory, you should see the same files as in the step for **Prepare Working Directory**
 ```
 docker exec -it turtle /bin/bash
 ```
 
-### Install Dependencies
-Install the packages
+## Install Dependencies
+We used detectron2 for deep learning pipeline framework and Mask R-CNN implementation. We used pytorch-segmentation-model for U-Net implementation. Our DPMR and UFO are developed based on these softwares.
+
+First setup the detectron2 and install its dependencies:
 ```
 python ./scripts/detectron2_setup.py
 ```
 
+Then install other requirements:
 ```
 pip install -r requirements.txt
 ```
 
 ## Quick Testing
-Run the following command for a quick test of all methods. This should takes no more than 10 minutes:
+Now we are ready to train and evaluate the models. Run `./scripts/deployment_test.sh` for a quick test on the whole pipeline for all 4 methods with only 140 samples:
 ```
 ./scripts/deployment_test.sh
 ```
 
 ## Training and Evaluation
 
-1. Train and evaluate native Mask R-CNN:
+We have one entry point for each of Mask R-CNN, DPMR, U-Net and UFO. Notice that UFO relies on U-Net results, so it has to be ran after U-Net training and evaluation.
+
+1. Train and evaluate standard Mask R-CNN:
 ```
 python mask_rcnn_train.py \
   --data_dir=./turtles-data/data \
@@ -47,7 +64,7 @@ python dual_prop_rcnn.py \
   --score_thresh=0.6
 ```
 
-3. Train and evaluate native U-Net
+3. Train and evaluate standard U-Net
 ```
 python unet_train.py \
   --data_dir=./turtles-data/data \
