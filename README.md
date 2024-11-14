@@ -6,18 +6,9 @@
 To setup dataset, download the dataset from kaggle: https://www.kaggle.com/datasets/wildlifedatasets/seaturtleid2022. After unzip the downloaded data, you should see a directory called `turtles-data`. Move that to the root directory of our project.
 
 ### Install Dependencies
-Our models were all developed with pytorch. First install the torch
 ```
 pip install torch==1.12.1+cu113 torchvision==0.13.1+cu113 --extra-index-url https://download.pytorch.org/whl/cu113
-```
-
-Then setup detectron2 and install all its dependencies with this script
-```
 python ./scripts/detectron2_setup.py
-```
-
-Finally, install other other dependencies
-```
 pip install -r requirements.txt
 ```
 
