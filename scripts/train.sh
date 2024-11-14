@@ -5,7 +5,7 @@ python mask_rcnn_train.py \
 python dual_prop_rcnn.py \
   --data_dir=./turtles-data/data \
   --output_dir=./output_dual_prop_rcnn \
-  --score_thresh=0.6
+  --intersection_thresh=0.6
 
 python unet_train.py \
   --data_dir=./turtles-data/data \

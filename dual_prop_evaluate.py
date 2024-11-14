@@ -61,7 +61,6 @@ def prepare_model(cfg, dev_mode, output_dir):
     cfg.MODEL.ROI_HEADS.BATCH_SIZE_PER_IMAGE = 16   # The "RoIHead batch size". 128 is faster, and good enough for this toy dataset (default: 512)
     cfg.MODEL.ROI_HEADS.NUM_CLASSES = 4  # only has one class (ballon). (see https://detectron2.readthedocs.io/tutorials/datasets.html#update-the-config-for-new-datasets)
     cfg.MODEL.DEVICE = 'cuda' if torch.cuda.is_available() else 'cpu'
-    cfg.MODEL.SUB_INSTANCE_INTERSECTION_THRESHOLD = 0.7
     cfg.INPUT.MASK_FORMAT = 'bitmask'
     cfg.OUTPUT_DIR = output_dir
     
@@ -72,8 +71,8 @@ def setup():
                        help='Directory for output files')
     parser.add_argument('--model_path', type=str, default='./output_dual_prop_rcnn/model_best.pth',
                        help='Path to the model weights')
-    parser.add_argument('--score_thresh', type=float, default=0.7,
-                       help='Score threshold for evaluation')
+    parser.add_argument('--intersection_thresh', type=float, default=0.6,
+                       help='Intersection threshold for filtering sub-instances')
     args = parser.parse_args()
     
     output_dir = os.path.join(args.output_dir, f"thr_{str(args.score_thresh).replace('.', '_')}")
@@ -85,7 +84,7 @@ def setup():
     os.makedirs(cfg.OUTPUT_DIR, exist_ok=False)
 
     cfg.MODEL.WEIGHTS = args.model_path
-    cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = args.score_thresh
+    cfg.MODEL.SUB_INSTANCE_INTERSECTION_THRESHOLD = args.intersection_thresh
     return cfg
 
 if __name__ == '__main__':
