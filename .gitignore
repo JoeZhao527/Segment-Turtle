@@ -171,3 +171,4 @@ comparison/
 nohup.out
 processed_images/
 .DS_Store
+!analysis/*.ipynb
