@@ -123,9 +123,11 @@ def split_n_prepare_turtle_semantic_coco(data_dir: str, dev_mode: bool = False, 
     """
     Process and prepare the turtle dataset under data_dir.
 
-    It prepares train, valid, and test sets for two settings:
-    1. the annotations for the whole turtle only
-    2. the annotations for flippers, head, and carapace
+    It prepares train, valid, and test sets by making a single mask contains 4 categories:
+        0) background
+        1) carapace
+        2) flippers
+        3) head
 
     Args:
         data_dir (str): the turtle data root dir
@@ -139,11 +141,6 @@ def split_n_prepare_turtle_semantic_coco(data_dir: str, dev_mode: bool = False, 
         }
 
     Avaliable dataset names:
-        - Whole turtle:
-            turtle_whole_train
-            turtle_whole_valid
-            turtle_whole_test
-
         - Turtle body parts:
             turtle_parts_train
             turtle_parts_valid
@@ -180,11 +177,6 @@ def split_n_prepare_turtle_semantic_coco(data_dir: str, dev_mode: bool = False, 
                 continue
 
         logger.info(f"Preprocessing and registering for {split_name} data...")
-
-        # Process and register the whole turtle dataset
-        # _data_name = f"turtle_whole_{split_name}"
-        # split_coco_whole = create_split_coco(img_ids, coco, process_body_parts=False)
-        # datasets[_data_name] = load_coco_api_semantic(split_coco_whole, data_dir, _data_name)
 
         # Process and register the turtle body parts dataset
         _data_name = f"turtle_parts_{split_name}"

@@ -33,9 +33,8 @@ def split_n_prepare_turtle_coco(data_dir: str, dev_mode: bool = False):
     """
     Process and prepare the turtle dataset under data_dir.
 
-    It prepares train, valid, and test sets for two settings:
-    1. the annotations for the whole turtle only
-    2. the annotations for flippers, head, and carapace
+    It prepares train, valid, and test sets by replacing whole turtle (category 1) with the carapace, and creating a new 
+    instance with category 4 for the whole turtle.
 
     Args:
         data_dir (str): the turtle data root dir

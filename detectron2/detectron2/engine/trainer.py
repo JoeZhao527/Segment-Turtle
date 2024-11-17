@@ -29,28 +29,6 @@ class CustomTrainer(DefaultTrainer):
             cfg.DATASETS.TEST[0], output_dir=cfg.OUTPUT_DIR
         ))
 
-
-def build_sem_seg_train_aug(cfg):
-    augs = [
-        T.ResizeShortestEdge(
-            cfg.INPUT.MIN_SIZE_TRAIN,
-            cfg.INPUT.MAX_SIZE_TRAIN,
-            cfg.INPUT.MIN_SIZE_TRAIN_SAMPLING,
-        )
-    ]
-    if cfg.INPUT.CROP.ENABLED:
-        augs.append(
-            T.RandomCrop_CategoryAreaConstraint(
-                cfg.INPUT.CROP.TYPE,
-                cfg.INPUT.CROP.SIZE,
-                cfg.INPUT.CROP.SINGLE_CATEGORY_MAX_AREA,
-                cfg.MODEL.SEM_SEG_HEAD.IGNORE_VALUE,
-            )
-        )
-    augs.append(T.RandomFlip())
-    return augs
-
-
 class TurtleSemanticTrainer(DefaultTrainer):
     def build_hooks(self):
         hooks = super().build_hooks()

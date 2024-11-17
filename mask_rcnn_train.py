@@ -1,3 +1,27 @@
+"""
+Train and evaluation entry point for Mask R-CNN.
+
+Data Preprocessing:
+    - Prepocess the original instances (whole turtle, flippers, head) into (carapace, flippers, head)
+    - entry function: split_n_prepare_turtle_coco
+    - file location: ./detectron2/detectron2/data/datasets/turtle_coco.py
+
+Model Architecture:
+    - configuration file: ./detectron2/configs/COCO-InstanceSegmentation/mask_rcnn_R_50_C4_3x.yaml
+    - model class: GeneralizedRCNN
+    - file location: ./detectron2/detectron2/modeling/meta_arch/rcnn.py
+
+Training:
+    - Save the best model based on the mIoU metric
+    - trainer class: CustomTrainer
+    - file location: ./detectron2/detectron2/engine/trainer.py
+
+Evaluation:
+    - Compute the mIoU metric for each body parts and their average
+    - Evaluator class: TurtleCOCOEvaluator
+    - file location: ./detectron2/detectron2/evaluation/turtle_coco_evaluation.py
+"""
+
 # Some basic setup:
 import sys, os, distutils.core
 sys.path.insert(0, os.path.abspath('./detectron2'))
@@ -103,7 +127,7 @@ if __name__ == '__main__':
     # Dumping the result to a json file
     result = inference_on_dataset(predictor.model, tst_loader, evaluator)
     print(result)
-    
+
     with open(os.path.join(cfg.OUTPUT_DIR, "result.json"), "w") as f:
         json.dump(result, f)
     

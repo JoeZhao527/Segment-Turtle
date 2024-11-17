@@ -1,3 +1,37 @@
+"""
+Train and evaluation entry point for U-Net.
+
+Data Preprocessing:
+    - Prepocess the original instances (whole turtle, flippers, head) into one mask contains 4 categories
+        0) background
+        1) carapace
+        2) flippers
+        3) head
+    - entry function: split_n_prepare_turtle_semantic_coco
+    - file location: ./detectron2/detectron2/data/datasets/turtle_coco_semantic.py
+
+Model Architecture:
+    - configuration file: ./detectron2/configs/Turtle-Semantic/unet-semantic.yaml
+    - model class: SemanticSegmentor
+    - file location: ./detectron2/detectron2/modeling/meta_arch/semantic_seg.py
+
+    The SemanticSegmentor uses the U-Net at:
+    - ./detectron2/detectron2/modeling/backbone/smp.py
+
+Training:
+    - Save the best model based on the mIoU metric, and use a customize dataset mapper for semantic segmentation
+    - trainer class: TurtleSemanticTrainer
+    - file location: ./detectron2/detectron2/engine/trainer.py
+
+    - dataset mapper: TurtleSemanticDatasetMapper
+    - file location: ./detectron2/detectron2/data/dataset_mapper.py
+
+Evaluation:
+    - Compute the mIoU metric for each body parts and their average
+    - Evaluator class: TurtleSemSegEvaluator
+    - file location: ./detectron2/detectron2/evaluation/turtle_coco_semantic_evaluation.py
+"""
+
 # Some basic setup:
 import sys, os, distutils.core
 sys.path.insert(0, os.path.abspath('./detectron2'))

@@ -1,3 +1,27 @@
+"""
+Train and evaluation entry point for Dual Proposal Mask R-CNN (DPMR).
+
+Data Preprocessing:
+    - Prepocess the original instances (whole turtle, flippers, head) into (carapace, flippers, head, whole turtle)
+    - entry function: split_n_prepare_turtle_coco
+    - file location: ./detectron2/detectron2/data/datasets/turtle_dual_proposal_rcnn.py
+
+Model Architecture:
+    - configuration file: ./detectron2/configs/COCO-InstanceSegmentation/dual_proposal_rcnn.yaml
+    - model class: DualProposalRCNNSingleHead
+    - file location: ./detectron2/detectron2/modeling/meta_arch/dual_prop_rcnn.py
+
+Training:
+    - Save the best model based on the mIoU metric
+    - trainer class: CustomTrainer
+    - file location: ./detectron2/detectron2/engine/trainer.py
+
+Evaluation:
+    - Compute the mIoU metric for each body parts and their average
+    - Evaluator class: TurtleCOCOEvaluator
+    - file location: ./detectron2/detectron2/evaluation/turtle_coco_evaluation.py
+"""
+
 # Some basic setup:
 import sys, os, distutils.core
 sys.path.insert(0, os.path.abspath('./detectron2'))

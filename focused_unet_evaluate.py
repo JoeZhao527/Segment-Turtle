@@ -1,3 +1,23 @@
+"""
+Evaluate the focused U-Net semantic segmentation model.
+
+Data Preprocessing:
+    - Same as U-Net (unet_train.py)
+
+Model Architecture:
+    - Same as U-Net (unet_train.py)
+
+Training:
+    - Same as U-Net (unet_train.py). This script does not re-train the model, 
+        it uses the trained U-Net and its inference results
+
+Evaluation:
+    - Use TurtleSemanticFocusedDatasetMapper to crop the image according to the first stage prediction
+    - file location: ./detectron2/detectron2/data/dataset_mapper.py
+
+    - Evaluator class: TurtleFocusSemSegEvaluator
+    - file location: ./detectron2/detectron2/evaluation/turtle_coco_semantic_evaluation.py
+"""
 # Some basic setup:
 import sys, os, distutils.core
 sys.path.insert(0, os.path.abspath('./detectron2'))
