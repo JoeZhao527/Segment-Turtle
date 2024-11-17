@@ -1,5 +1,18 @@
 # Segment-Turtle
 
+## Project Structure
+
+### Directories
+- `scripts/`: some integrated shell scripts for developing purpose
+- `detectron2/`: data processing, model, training and evaluation implementation
+- `analysis/`: some notebooks for analysis the model results
+
+### Main Entry (for training and evaluation)
+- Mask R-CNN: `mask_rcnn_train.py`
+- DPMR: `dual_prop_rcnn.py`
+- U-Net: `unet_train.py`
+- UFO: `focused_unet_evaluate.py`
+
 ## Install Dataset
 To setup dataset, download the dataset from kaggle: https://www.kaggle.com/datasets/wildlifedatasets/seaturtleid2022. After unzip the downloaded data, you should see a directory called `turtles-data`. Move that to the root directory of our project.
 
