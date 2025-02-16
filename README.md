@@ -1,5 +1,8 @@
 # Segment-Turtle
 
+## Authors
+Haokai Zhao, Jonas Macken, Liangji Kong, Ruiyuan Yang, Yaqing He
+
 ## Project Report
 Please find out our project report at [Report.pdf](https://github.com/JoeZhao527/Segment-Turtle/blob/main/Report.pdf).
 
