@@ -153,3 +153,6 @@ For U-Net and UFO, the prediction results are output in `sem_seg_predictions.jso
     ...
 }
 ```
+
+## Acknowledgement
+This repo is built based on [detectron2](https://github.com/facebookresearch/detectron2).
