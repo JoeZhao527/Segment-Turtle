@@ -1,5 +1,8 @@
 # Segment-Turtle
 
+## Project Report
+Please find out our project report at [Report.pdf](https://github.com/JoeZhao527/Segment-Turtle/blob/main/Report.pdf).
+
 ## Project Structure
 
 ### Directories
